@@ -1,0 +1,1716 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>PLAYCARE — Живые Игрушки</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0a12;
+    --bg2: #13101a;
+    --bg3: #1a1525;
+    --border: #2a2040;
+    --accent: #c084fc;
+    --accent2: #f472b6;
+    --accent3: #fb923c;
+    --text: #e8e0f0;
+    --text-dim: #8b7fa8;
+    --glow: rgba(192, 132, 252, 0.15);
+    --glow2: rgba(244, 114, 182, 0.1);
+    --gold: #fbbf24;
+    --green: #4ade80;
+    --red: #f87171;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Crimson Pro', Georgia, serif;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 20% 10%, rgba(192,132,252,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 30% at 80% 80%, rgba(244,114,182,0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 50% at 50% 50%, rgba(251,146,60,0.03) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 15% 20%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 35% 60%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 15%, rgba(255,255,255,0.35) 0%, transparent 100%),
+      radial-gradient(1px 1px at 85% 45%, rgba(255,255,255,0.25) 0%, transparent 100%),
+      radial-gradient(1px 1px at 55% 80%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 75%, rgba(255,255,255,0.2) 0%, transparent 100%),
+      radial-gradient(1px 1px at 10% 85%, rgba(255,255,255,0.25) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HEADER */
+  header {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 8px 16px 6px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(13,10,18,0.95) 0%, rgba(19,16,26,0.9) 100%);
+    backdrop-filter: blur(10px);
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .lamp {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fef08a 0%, #fb923c 50%, #dc2626 100%);
+    box-shadow: 0 0 20px 8px rgba(251,146,60,0.4), 0 0 40px 15px rgba(254,240,138,0.15);
+    flex-shrink: 0;
+    animation: pulse-lamp 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-lamp {
+    0%, 100% { box-shadow: 0 0 20px 8px rgba(251,146,60,0.4), 0 0 40px 15px rgba(254,240,138,0.15); }
+    50% { box-shadow: 0 0 28px 12px rgba(251,146,60,0.55), 0 0 55px 20px rgba(254,240,138,0.2); }
+  }
+
+  header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-shadow: 0 0 20px rgba(192,132,252,0.5);
+  }
+
+  header p.sub {
+    font-size: 0.62rem;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    font-style: italic;
+  }
+
+  /* STATUS BAR */
+  #status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 4px;
+    flex-wrap: wrap;
+  }
+
+  .stat-pill {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2px 8px;
+    font-size: 0.68rem;
+    font-family: 'Cinzel', serif;
+    cursor: default;
+    transition: border-color 0.2s;
+    white-space: nowrap;
+  }
+
+  .stat-pill.tokens { border-color: rgba(251,191,36,0.3); }
+  .stat-pill.level { border-color: rgba(192,132,252,0.3); }
+  .stat-pill.char { border-color: rgba(244,114,182,0.3); }
+
+  .stat-pill .val {
+    font-weight: 600;
+  }
+  .stat-pill.tokens .val { color: var(--gold); }
+  .stat-pill.level .val { color: var(--accent); }
+  .stat-pill.char .val { color: var(--accent2); font-size: 0.68rem; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .stat-pill .icon { font-size: 0.8rem; }
+
+  /* PANEL BUTTONS in header */
+  .header-btns {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    margin-top: 5px;
+    flex-wrap: wrap;
+  }
+
+  .hdr-btn {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 2px 8px;
+    color: var(--text-dim);
+    font-family: 'Cinzel', serif;
+    font-size: 0.58rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .hdr-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* API KEY SCREEN */
+  #api-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(13,10,18,0.97);
+    backdrop-filter: blur(20px);
+    padding: 20px;
+  }
+
+  .api-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px 24px;
+    max-width: 360px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 0 60px rgba(192,132,252,0.1), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+
+  .api-card .icon { font-size: 2.5rem; margin-bottom: 12px; }
+
+  .api-card h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    color: var(--accent);
+    margin-bottom: 8px;
+    letter-spacing: 0.1em;
+  }
+
+  .api-card p {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .api-card p a { color: var(--accent2); text-decoration: none; }
+
+  input[type="password"], input[type="text"] {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    margin-bottom: 12px;
+  }
+
+  input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(192,132,252,0.15);
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.3);
+  }
+
+  .btn-primary:active { transform: scale(0.98); opacity: 0.9; }
+
+  .api-note {
+    margin-top: 14px;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+
+  /* MAIN APP */
+  #app {
+    display: none;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  #app.visible { display: flex; }
+
+  /* CHAT AREA */
+  #chat {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 16px 16px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    scroll-behavior: smooth;
+  }
+
+  #chat::-webkit-scrollbar { width: 4px; }
+  #chat::-webkit-scrollbar-track { background: transparent; }
+  #chat::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* MESSAGES */
+  .msg {
+    max-width: 88%;
+    animation: msg-in 0.3s ease-out;
+  }
+
+  @keyframes msg-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .msg-narrator { align-self: flex-start; }
+  .msg-user { align-self: flex-end; }
+
+  .msg-narrator .bubble {
+    background: linear-gradient(135deg, var(--bg2) 0%, var(--bg3) 100%);
+    border: 1px solid var(--border);
+    border-radius: 4px 16px 16px 16px;
+    padding: 14px 16px;
+    font-size: 0.95rem;
+    line-height: 1.75;
+    color: var(--text);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03);
+    position: relative;
+  }
+
+  .msg-narrator .bubble::before {
+    content: '✦';
+    position: absolute;
+    top: -10px;
+    left: 12px;
+    font-size: 0.6rem;
+    color: var(--accent);
+    opacity: 0.7;
+  }
+
+  .msg-user .bubble {
+    background: linear-gradient(135deg, #3b1d6e, #4c1d95);
+    border: 1px solid rgba(192,132,252,0.3);
+    border-radius: 16px 4px 16px 16px;
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #e9d5ff;
+    box-shadow: 0 2px 12px rgba(124,58,237,0.2);
+  }
+
+  .msg-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    margin-bottom: 5px;
+    padding: 0 4px;
+    font-family: 'Cinzel', serif;
+  }
+
+  .msg-user .msg-label { text-align: right; }
+
+  .msg-narrator .bubble strong {
+    color: var(--accent2);
+    font-weight: 600;
+    display: block;
+    margin-top: 4px;
+    cursor: pointer;
+    transition: color 0.15s;
+    padding: 2px 0;
+  }
+
+  .msg-narrator .bubble strong:hover { color: var(--accent); }
+
+  /* system event message */
+  .msg-system {
+    align-self: center;
+    max-width: 90%;
+  }
+  .msg-system .bubble {
+    background: rgba(192,132,252,0.07);
+    border: 1px solid rgba(192,132,252,0.2);
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    text-align: center;
+    font-style: italic;
+  }
+
+  /* TYPING */
+  .msg-typing .bubble { padding: 16px 20px; }
+
+  .dots { display: flex; gap: 5px; align-items: center; }
+
+  .dots span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: dot-bounce 1.2s ease-in-out infinite;
+    opacity: 0.7;
+  }
+
+  .dots span:nth-child(2) { animation-delay: 0.2s; background: var(--accent2); }
+  .dots span:nth-child(3) { animation-delay: 0.4s; background: var(--accent3); }
+
+  @keyframes dot-bounce {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.7; }
+    40% { transform: translateY(-6px); opacity: 1; }
+  }
+
+  /* INPUT AREA */
+  #input-area {
+    flex-shrink: 0;
+    padding: 10px 14px 14px;
+    background: linear-gradient(0deg, rgba(13,10,18,0.98) 0%, rgba(13,10,18,0.8) 100%);
+    backdrop-filter: blur(15px);
+    border-top: 1px solid var(--border);
+  }
+
+  .input-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+
+  #user-input {
+    flex: 1;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-family: 'Crimson Pro', serif;
+    font-size: 1rem;
+    outline: none;
+    resize: none;
+    max-height: 100px;
+    min-height: 44px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    line-height: 1.4;
+  }
+
+  #user-input:focus {
+    border-color: rgba(192,132,252,0.5);
+    box-shadow: 0 0 0 3px rgba(192,132,252,0.08);
+  }
+
+  #user-input::placeholder { color: var(--text-dim); font-style: italic; }
+
+  #send-btn {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s, transform 0.1s;
+    box-shadow: 0 3px 12px rgba(124,58,237,0.35);
+  }
+
+  #send-btn:active { transform: scale(0.93); }
+  #send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  #send-btn svg { width: 18px; height: 18px; fill: white; }
+
+  .input-hint {
+    text-align: center;
+    font-size: 0.62rem;
+    color: var(--text-dim);
+    margin-top: 6px;
+    font-style: italic;
+    opacity: 0.7;
+  }
+
+  /* COMMANDS BAR */
+  .cmd-bar {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    scrollbar-width: none;
+  }
+
+  .cmd-bar::-webkit-scrollbar { display: none; }
+
+  .cmd-btn {
+    flex-shrink: 0;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 11px;
+    color: var(--text-dim);
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.73rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .cmd-btn:active, .cmd-btn:hover {
+    background: var(--bg2);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .cmd-btn.special {
+    border-color: rgba(251,191,36,0.3);
+    color: var(--gold);
+  }
+
+  /* Error */
+  .msg-error .bubble {
+    background: rgba(239,68,68,0.1);
+    border-color: rgba(239,68,68,0.3);
+    color: #fca5a5;
+    font-size: 0.85rem;
+  }
+
+  /* OVERLAY PANEL (inventory, shop, save) */
+  .panel-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: rgba(13,10,18,0.85);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0;
+    animation: panel-fade 0.2s ease-out;
+  }
+
+  @keyframes panel-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .panel-sheet {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 20px 20px 0 0;
+    width: 100%;
+    max-width: 500px;
+    max-height: 75vh;
+    overflow-y: auto;
+    padding: 20px 18px 30px;
+    animation: panel-up 0.25s ease-out;
+    box-shadow: 0 -10px 60px rgba(0,0,0,0.5);
+  }
+
+  @keyframes panel-up {
+    from { transform: translateY(60px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .panel-sheet::-webkit-scrollbar { width: 3px; }
+  .panel-sheet::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .panel-header h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+  }
+
+  .panel-close {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 4px 10px;
+    color: var(--text-dim);
+    font-size: 0.75rem;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+  }
+
+  /* SHOP items */
+  .shop-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .shop-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+
+  .shop-item:hover { border-color: var(--accent); }
+  .shop-item.cant-afford { opacity: 0.45; cursor: not-allowed; }
+
+  .shop-item .s-icon { font-size: 1.6rem; margin-bottom: 5px; }
+  .shop-item .s-name { font-family: 'Cinzel', serif; font-size: 0.7rem; color: var(--text); margin-bottom: 3px; }
+  .shop-item .s-desc { font-size: 0.72rem; color: var(--text-dim); line-height: 1.3; margin-bottom: 6px; font-style: italic; }
+  .shop-item .s-price { font-size: 0.75rem; color: var(--gold); font-family: 'Cinzel', serif; }
+  .shop-item .s-effect { font-size: 0.65rem; color: var(--green); margin-top: 2px; }
+
+  /* INVENTORY items */
+  .inv-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .inv-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .inv-item .i-icon { font-size: 1.4rem; flex-shrink: 0; }
+  .inv-item .i-info { flex: 1; }
+  .inv-item .i-name { font-family: 'Cinzel', serif; font-size: 0.75rem; color: var(--text); }
+  .inv-item .i-desc { font-size: 0.72rem; color: var(--text-dim); font-style: italic; }
+  .inv-item .i-use {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    border: none;
+    border-radius: 8px;
+    padding: 5px 12px;
+    color: white;
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: opacity 0.2s;
+  }
+  .inv-item .i-use:hover { opacity: 0.85; }
+  .inv-empty { text-align: center; color: var(--text-dim); font-style: italic; font-size: 0.85rem; padding: 20px; }
+
+  /* LVL PANEL */
+  .lvl-panel { text-align: center; }
+  .lvl-big { font-family: 'Cinzel', serif; font-size: 3rem; color: var(--accent); line-height: 1; margin: 10px 0; }
+  .lvl-bar-wrap { background: var(--bg3); border-radius: 10px; height: 8px; overflow: hidden; margin: 10px 0; }
+  .lvl-bar { height: 100%; background: linear-gradient(90deg, #7c3aed, #c084fc); border-radius: 10px; transition: width 0.5s; }
+  .lvl-desc { font-size: 0.82rem; color: var(--text-dim); line-height: 1.5; margin-bottom: 14px; }
+
+  .lvl-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 10px; }
+  .lvl-btn {
+    background: var(--bg3);
+    border: 1px solid rgba(192,132,252,0.3);
+    border-radius: 10px;
+    padding: 8px 16px;
+    color: var(--accent);
+    font-family: 'Cinzel', serif;
+    font-size: 0.72rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .lvl-btn:hover { background: rgba(192,132,252,0.1); }
+  .lvl-btn.gold { border-color: rgba(251,191,36,0.4); color: var(--gold); }
+  .lvl-btn.gold:hover { background: rgba(251,191,36,0.08); }
+
+  /* SAVE PANEL */
+  .save-list { display: flex; flex-direction: column; gap: 8px; }
+  .save-slot {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .save-slot .s-info { flex: 1; }
+  .save-slot .s-name { font-family: 'Cinzel', serif; font-size: 0.75rem; color: var(--text); }
+  .save-slot .s-meta { font-size: 0.68rem; color: var(--text-dim); font-style: italic; }
+  .save-slot-btns { display: flex; gap: 6px; }
+  .s-btn {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 4px 10px;
+    color: var(--text-dim);
+    font-size: 0.68rem;
+    font-family: 'Cinzel', serif;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .s-btn.load { border-color: rgba(74,222,128,0.3); color: var(--green); }
+  .s-btn.del { border-color: rgba(248,113,113,0.3); color: var(--red); }
+  .s-btn:hover { opacity: 0.8; }
+
+  .save-new-btn {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    border: none;
+    border-radius: 10px;
+    padding: 11px;
+    color: white;
+    font-family: 'Cinzel', serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+    transition: opacity 0.2s;
+  }
+  .save-new-btn:hover { opacity: 0.85; }
+
+  /* Toast */
+  #toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-size: 0.82rem;
+    color: var(--text);
+    font-family: 'Cinzel', serif;
+    z-index: 200;
+    opacity: 0;
+    transition: opacity 0.25s, transform 0.25s;
+    pointer-events: none;
+    text-align: center;
+    max-width: 280px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+  #toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* РП-форматирование в сообщениях игрока */
+  .msg-user .bubble strong.rp-action {
+    font-weight: 700;
+    color: #e9d5ff;
+    font-style: italic;
+    display: inline;
+    cursor: default;
+  }
+
+  .msg-user .bubble em.rp-speech {
+    color: var(--accent2);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  textarea::-webkit-scrollbar { width: 3px; }
+  textarea::-webkit-scrollbar-thumb { background: var(--border); }
+
+  /* При маленькой высоте (zoom или маленький экран) — сжимаем шапку */
+  @media (max-height: 600px) {
+    header { padding: 4px 12px 3px; }
+    .lamp { width: 16px; height: 16px; margin-bottom: 3px; }
+    header h1 { font-size: 0.82rem; }
+    header p.sub { display: none; }
+    #status-bar { margin-top: 2px; gap: 5px; }
+    .stat-pill { font-size: 0.62rem; padding: 1px 6px; }
+    .header-btns { margin-top: 3px; gap: 3px; }
+    .hdr-btn { font-size: 0.54rem; padding: 1px 6px; }
+    #input-area { padding: 6px 10px 8px; }
+    .cmd-bar { padding-bottom: 5px; margin-bottom: 5px; }
+  }
+
+  @media (max-height: 450px) {
+    header p.sub { display: none; }
+    #status-bar { display: none; }
+    .header-btns { margin-top: 2px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- API KEY SCREEN -->
+<div id="api-screen">
+  <div class="api-card">
+    <div class="icon">🏮</div>
+    <h2>PLAYCARE</h2>
+    <p>Введи свой <strong style="color:var(--accent)">Groq API ключ</strong> для входа.<br>
+    Получить бесплатно: <a href="https://console.groq.com" target="_blank">console.groq.com</a><br>
+    <span style="font-size:0.75rem;color:var(--text-dim)">Sign up → API Keys → Create API Key</span></p>
+    <input type="password" id="api-key-input" placeholder="gsk_..." autocomplete="off" />
+    <button class="btn-primary" onclick="startApp()">ВОЙТИ В PLAYCARE</button>
+    <p class="api-note">🔒 Ключ хранится только в памяти сессии</p>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <header>
+    <div class="header-top">
+      <div class="lamp"></div>
+      <h1>PLAYCARE</h1>
+    </div>
+    <p class="sub">ТУТ КАЖДЫЙ НАЙДЁТ СВОЁ МЕСТО</p>
+    <div id="status-bar">
+      <div class="stat-pill char">
+        <span class="icon">🎭</span>
+        <span class="val" id="stat-char">—</span>
+      </div>
+      <div class="stat-pill level">
+        <span class="icon">⚔️</span>
+        <span>LVL</span>
+        <span class="val" id="stat-lvl">5</span>
+      </div>
+      <div class="stat-pill tokens">
+        <span class="icon">🪙</span>
+        <span class="val" id="stat-tokens">0</span>
+        <span style="color:var(--text-dim);font-size:0.65rem">PT</span>
+      </div>
+    </div>
+    <div class="header-btns">
+      <button class="hdr-btn" onclick="openPanel('inventory')">🎒 Инвентарь</button>
+      <button class="hdr-btn" onclick="openPanel('shop')">🏪 Магазин</button>
+      <button class="hdr-btn" onclick="openPanel('level')">⚔️ Уровень</button>
+      <button class="hdr-btn" onclick="openPanel('saves')">💾 Сохранения</button>
+    </div>
+  </header>
+
+  <div id="chat"></div>
+
+  <div id="input-area">
+    <div class="cmd-bar">
+      <button class="cmd-btn" onclick="sendCommand('!где')">!где</button>
+      <button class="cmd-btn" onclick="sendCommand('!игрушки')">!игрушки</button>
+      <button class="cmd-btn" onclick="sendCommand('!расписание')">!расписание</button>
+      <button class="cmd-btn" onclick="sendCommand('!отношения')">!отношения</button>
+      <button class="cmd-btn" onclick="sendCommand('!статус')">!статус</button>
+      <button class="cmd-btn special" onclick="sendCommand('!токены')">🪙 !токены</button>
+      <button class="cmd-btn special" onclick="sendCommand('!инвентарь')">🎒 !инвентарь</button>
+      <button class="cmd-btn" onclick="sendCommand('!случай')">🎲 !случай</button>
+      <button class="cmd-btn" onclick="sendCommand('!сброс стиля')">!сброс стиля</button>
+    </div>
+    <div class="input-row">
+      <textarea id="user-input" placeholder="Напиши от своего персонажа…" rows="1"
+        onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <button id="send-btn" onclick="sendMessage()" title="Отправить">
+        <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
+      </button>
+    </div>
+    <div class="input-hint">Enter — новая строка · Ctrl+Enter — отправить быстро</div>
+  </div>
+</div>
+
+<!-- PANEL OVERLAY -->
+<div id="panel-overlay" class="panel-overlay" style="display:none" onclick="closePanelIfBg(event)">
+  <div class="panel-sheet" id="panel-sheet">
+    <!-- content injected by JS -->
+  </div>
+</div>
+
+<script>
+// ===================== GAME STATE =====================
+let apiKey = '';
+let history = [];
+let isLoading = false;
+
+let gameState = {
+  char: null,
+  tokens: 0,
+  level: 5,
+  inventory: [],
+  relations: {}, // NPC name -> {love: 0-100, friend: 0-100}
+};
+
+// ===================== SHOP CATALOGUE =====================
+const SHOP_ITEMS = [
+  {
+    id: 'flower',
+    icon: '🌸',
+    name: 'Цветок',
+    desc: 'Нежный подарок — поднимает романтику',
+    price: 2,
+    effect: '+15 к романтике с выбранным NPC',
+    type: 'gift',
+    romantic: 15,
+    friend: 5,
+  },
+  {
+    id: 'candy',
+    icon: '🍬',
+    name: 'Конфетки',
+    desc: 'Сладкое угощение для друга',
+    price: 1,
+    effect: '+10 к дружбе с выбранным NPC',
+    type: 'gift',
+    romantic: 0,
+    friend: 10,
+  },
+  {
+    id: 'plushie',
+    icon: '🧸',
+    name: 'Маленькая игрушка',
+    desc: 'Уютный подарок. Особо ценится ночью',
+    price: 3,
+    effect: '+20 к дружбе, +10 к романтике',
+    type: 'gift',
+    romantic: 10,
+    friend: 20,
+  },
+  {
+    id: 'letter',
+    icon: '💌',
+    name: 'Письмо',
+    desc: 'Написанное от сердца признание',
+    price: 2,
+    effect: '+25 к романтике с выбранным NPC',
+    type: 'gift',
+    romantic: 25,
+    friend: 0,
+  },
+  {
+    id: 'bracelet',
+    icon: '📿',
+    name: 'Браслет дружбы',
+    desc: 'Символ настоящей дружбы',
+    price: 4,
+    effect: '+30 к дружбе с выбранным NPC',
+    type: 'gift',
+    romantic: 5,
+    friend: 30,
+  },
+  {
+    id: 'stardust',
+    icon: '✨',
+    name: 'Звёздная пыль',
+    desc: 'Таинственный артефакт Playcare. Даёт +1 LVL',
+    price: 3,
+    effect: '+1 LVL немедленно',
+    type: 'boost',
+  },
+  {
+    id: 'amulet',
+    icon: '🔮',
+    name: 'Защитный амулет',
+    desc: 'Защищает от потери уровня при травме (1 раз)',
+    price: 5,
+    effect: 'Блокирует -LVL при травме',
+    type: 'protect',
+  },
+  {
+    id: 'note',
+    icon: '📝',
+    name: 'Тайная записка',
+    desc: 'Загадочная записка запускает случайное событие',
+    price: 2,
+    effect: 'Запускает случайное событие',
+    type: 'event',
+  },
+];
+
+// ===================== UI HELPERS =====================
+function toast(msg, duration = 2200) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration);
+}
+
+function updateStatusBar() {
+  document.getElementById('stat-char').textContent = gameState.char || '—';
+  document.getElementById('stat-lvl').textContent = gameState.level;
+  document.getElementById('stat-tokens').textContent = gameState.tokens;
+}
+
+function addTokens(n) {
+  gameState.tokens = Math.max(0, gameState.tokens + n);
+  updateStatusBar();
+}
+
+function addLevel(n) {
+  gameState.level = Math.max(1, gameState.level + n);
+  updateStatusBar();
+}
+
+// ===================== MESSAGE PARSING =====================
+// Parse AI response for [+PT:N], [-PT:N], [+LVL], [-LVL], [CHAR:name] tags
+function parseAITags(text) {
+  // Tokens
+  text = text.replace(/\[(\+|-)PT:(\d+)\]/g, (_, sign, num) => {
+    const n = parseInt(num);
+    if (sign === '+') {
+      addTokens(n);
+      toast(`🪙 +${n} Play-Token!`);
+    } else {
+      addTokens(-n);
+      toast(`🪙 -${n} Play-Token`);
+    }
+    return '';
+  });
+  // Level
+  text = text.replace(/\[(\+|-|)LVL(?::(\d+))?\]/g, (_, sign, num) => {
+    const n = parseInt(num || '1');
+    if (sign === '-') {
+      const hasAmulet = gameState.inventory.find(i => i.id === 'amulet');
+      if (hasAmulet) {
+        gameState.inventory = gameState.inventory.filter(i => i !== hasAmulet);
+        toast('🔮 Амулет защитил от потери уровня!');
+      } else {
+        addLevel(-n);
+        toast(`⚔️ -${n} LVL! Потрать Play-Token для восстановления`, 3000);
+      }
+    } else {
+      addLevel(n);
+      toast(`⚔️ +${n} LVL!`);
+    }
+    return '';
+  });
+  // Character recognition
+  text = text.replace(/\[CHAR:([^\]]+)\]/g, (_, name) => {
+    if (!gameState.char) {
+      gameState.char = name.trim();
+      updateStatusBar();
+    }
+    return '';
+  });
+  return text.trim();
+}
+
+// ===================== MESSAGES =====================
+function addMessage(role, text) {
+  const chat = document.getElementById('chat');
+  const typing = document.getElementById('typing-msg');
+  if (typing) typing.remove();
+
+  if (role === 'narrator') text = parseAITags(text);
+
+  const div = document.createElement('div');
+  div.className = `msg msg-${role === 'narrator' ? 'narrator' : role === 'error' ? 'error' : role === 'system' ? 'system' : 'user'}`;
+
+  const label = document.createElement('div');
+  label.className = 'msg-label';
+  label.textContent = role === 'narrator' ? '✦ РАССКАЗЧИК' : role === 'error' ? '⚠ ОШИБКА' : role === 'system' ? '' : '▸ ВЫ';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+
+  if (role === 'user') {
+    bubble.innerHTML = parseUserText(text);
+  } else {
+    const parsed = text.replace(/\*\*(.+?)\*\*/g, (_, content) => {
+      return `<strong onclick="clickChoice('${content.replace(/'/g, "\\'")}')">${content}</strong>`;
+    });
+    bubble.innerHTML = parsed.replace(/\n/g, '<br>');
+  }
+
+  if (role !== 'system') div.appendChild(label);
+  div.appendChild(bubble);
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function parseUserText(text) {
+  // **текст** → жирный (РП-действие)
+  text = text.replace(/\*\*(.+?)\*\*/gs, '<strong class="rp-action">$1</strong>');
+  // *текст* → тоже жирный (одна звёздочка тоже работает)
+  text = text.replace(/\*([^*\n]+?)\*/g, '<strong class="rp-action">$1</strong>');
+  // "текст" → розовый курсив (монолог/речь)
+  text = text.replace(/"([^"]+)"/g, '<em class="rp-speech">"$1"</em>');
+  // переносы строк
+  text = text.replace(/\n/g, '<br>');
+  return text;
+}
+
+function addSystemMsg(text) {
+  addMessage('system', text);
+}
+
+function clickChoice(text) {
+  document.getElementById('user-input').value = text;
+  sendMessage();
+}
+
+function showTyping() {
+  const chat = document.getElementById('chat');
+  const div = document.createElement('div');
+  div.className = 'msg msg-narrator msg-typing';
+  div.id = 'typing-msg';
+  div.innerHTML = `<div class="msg-label">✦ РАССКАЗЧИК</div><div class="bubble"><div class="dots"><span></span><span></span><span></span></div></div>`;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+// ===================== API CALL =====================
+async function sendToGroq(userText) {
+  if (isLoading) return;
+  isLoading = true;
+  document.getElementById('send-btn').disabled = true;
+  showTyping();
+
+  history.push({ role: 'user', content: userText });
+
+  const messages = [
+    { role: 'system', content: SYSTEM_PROMPT },
+    ...history
+  ];
+
+  const body = {
+    model: 'llama-3.3-70b-versatile',
+    messages,
+    temperature: 0.9,
+    max_tokens: 1200,
+  };
+
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify(body)
+    });
+
+    const data = await res.json();
+
+    if (data.error) {
+      document.getElementById('typing-msg')?.remove();
+      addMessage('error', `Ошибка API: ${data.error.message}`);
+      history.pop();
+    } else {
+      const reply = data.choices?.[0]?.message?.content || '...';
+      history.push({ role: 'assistant', content: reply });
+      addMessage('narrator', reply);
+      // Try to detect character name from first messages
+      detectCharFromHistory();
+    }
+  } catch (e) {
+    document.getElementById('typing-msg')?.remove();
+    addMessage('error', 'Ошибка соединения. Проверь VPN и API ключ.');
+    history.pop();
+  }
+
+  isLoading = false;
+  document.getElementById('send-btn').disabled = false;
+}
+
+function detectCharFromHistory() {
+  if (gameState.char) return;
+  // Simple heuristic: look at last user message for a character name match
+  const chars = ['Киккин','Нап','Дэй','Бубба','Бобби','Пикки','Крафти','Хоппи','Саймон','Мэгги','Икки','Баба','Раби','Поу','Аллистер','Туй'];
+  for (const msg of history) {
+    if (msg.role === 'user') {
+      for (const c of chars) {
+        if (msg.content.toLowerCase().includes(c.toLowerCase())) {
+          gameState.char = c;
+          updateStatusBar();
+          return;
+        }
+      }
+    }
+  }
+}
+
+// ===================== SEND =====================
+function sendMessage() {
+  const input = document.getElementById('user-input');
+  const text = input.value.trim();
+  if (!text || isLoading) return;
+  input.value = '';
+  input.style.height = '';
+  addMessage('user', text);
+  sendToGroq(text);
+}
+
+function sendCommand(cmd) {
+  if (isLoading) return;
+  addMessage('user', cmd);
+  sendToGroq(cmd);
+}
+
+function handleKey(e) {
+  // Enter теперь всегда = новая строка. Отправка только кнопкой.
+  // Ctrl+Enter или Cmd+Enter = быстрая отправка для тех кто хочет
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+}
+
+// ===================== START =====================
+function startApp() {
+  const key = document.getElementById('api-key-input').value.trim();
+  if (!key) return;
+  apiKey = key;
+  document.getElementById('api-screen').style.display = 'none';
+  document.getElementById('app').classList.add('visible');
+  updateStatusBar();
+  startSession();
+}
+
+document.getElementById('api-key-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') startApp();
+});
+
+async function startSession() {
+  await sendToGroq('Начни сессию — приветствуй игрока и попроси выбрать персонажа.');
+}
+
+// ===================== PANELS =====================
+function openPanel(type) {
+  const overlay = document.getElementById('panel-overlay');
+  const sheet = document.getElementById('panel-sheet');
+  overlay.style.display = 'flex';
+
+  if (type === 'inventory') renderInventory(sheet);
+  else if (type === 'shop') renderShop(sheet);
+  else if (type === 'level') renderLevel(sheet);
+  else if (type === 'saves') renderSaves(sheet);
+}
+
+function closePanel() {
+  document.getElementById('panel-overlay').style.display = 'none';
+}
+
+function closePanelIfBg(e) {
+  if (e.target === document.getElementById('panel-overlay')) closePanel();
+}
+
+// --- INVENTORY ---
+function renderInventory(el) {
+  el.innerHTML = `
+    <div class="panel-header">
+      <h3>🎒 Инвентарь</h3>
+      <button class="panel-close" onclick="closePanel()">✕ Закрыть</button>
+    </div>
+    <div class="inv-list" id="inv-list-inner"></div>
+  `;
+  const list = el.querySelector('#inv-list-inner');
+  if (gameState.inventory.length === 0) {
+    list.innerHTML = '<div class="inv-empty">Инвентарь пуст.<br>Купи что-нибудь в Магазине!</div>';
+    return;
+  }
+  gameState.inventory.forEach((item, idx) => {
+    const d = document.createElement('div');
+    d.className = 'inv-item';
+    d.innerHTML = `
+      <div class="i-icon">${item.icon}</div>
+      <div class="i-info">
+        <div class="i-name">${item.name}</div>
+        <div class="i-desc">${item.effect}</div>
+      </div>
+      <button class="i-use" onclick="useItem(${idx})">Использовать</button>
+    `;
+    list.appendChild(d);
+  });
+}
+
+function useItem(idx) {
+  const item = gameState.inventory[idx];
+  if (!item) return;
+  closePanel();
+
+  if (item.type === 'boost') {
+    addLevel(1);
+    gameState.inventory.splice(idx, 1);
+    addSystemMsg(`✨ Ты использовал ${item.name} — получен +1 LVL!`);
+    sendToGroq(`[Игрок использовал предмет "${item.name}" и получил +1 LVL]`);
+  } else if (item.type === 'protect') {
+    toast('🔮 Амулет активен — защитит от следующей потери LVL');
+  } else if (item.type === 'event') {
+    gameState.inventory.splice(idx, 1);
+    addSystemMsg(`📝 Таинственная записка исчезает в кармане...`);
+    sendToGroq(`[Игрок передал "${item.name}" — немедленно запусти интересное случайное событие в Playcare]`);
+  } else if (item.type === 'gift') {
+    // Prompt user to pick NPC
+    const npc = prompt('Кому подарить? (введи имя персонажа)');
+    if (!npc) return;
+    if (!gameState.relations[npc]) gameState.relations[npc] = { love: 0, friend: 0 };
+    gameState.relations[npc].love += item.romantic || 0;
+    gameState.relations[npc].friend += item.friend || 0;
+    gameState.inventory.splice(idx, 1);
+    addSystemMsg(`${item.icon} Ты подарил ${item.name} → ${npc}! Романтика +${item.romantic}, Дружба +${item.friend}`);
+    sendToGroq(`[Игрок подарил "${item.name}" персонажу ${npc}. Это влияет на их отношения: романтика +${item.romantic || 0}, дружба +${item.friend || 0}. Опиши реакцию ${npc} на подарок]`);
+  }
+}
+
+// --- SHOP ---
+function renderShop(el) {
+  el.innerHTML = `
+    <div class="panel-header">
+      <h3>🏪 Магазин Игрушек · <span style="color:var(--gold)">🪙 ${gameState.tokens} PT</span></h3>
+      <button class="panel-close" onclick="closePanel()">✕ Закрыть</button>
+    </div>
+    <div class="shop-grid"></div>
+  `;
+  const grid = el.querySelector('.shop-grid');
+  SHOP_ITEMS.forEach(item => {
+    const cant = gameState.tokens < item.price;
+    const d = document.createElement('div');
+    d.className = `shop-item${cant ? ' cant-afford' : ''}`;
+    d.innerHTML = `
+      <div class="s-icon">${item.icon}</div>
+      <div class="s-name">${item.name}</div>
+      <div class="s-desc">${item.desc}</div>
+      <div class="s-price">🪙 ${item.price} PT</div>
+      <div class="s-effect">${item.effect}</div>
+    `;
+    if (!cant) d.onclick = () => buyItem(item);
+    grid.appendChild(d);
+  });
+}
+
+function buyItem(item) {
+  if (gameState.tokens < item.price) {
+    toast('❌ Не хватает Play-Token!');
+    return;
+  }
+  addTokens(-item.price);
+  gameState.inventory.push({ ...item });
+  closePanel();
+  toast(`${item.icon} Куплено: ${item.name}!`);
+  addSystemMsg(`🏪 Буги-бот: "${item.name}" добавлен в инвентарь. Потрачено ${item.price} PT.`);
+}
+
+// --- LEVEL ---
+function renderLevel(el) {
+  const lvl = gameState.level;
+  const pct = Math.min(100, (lvl / 20) * 100);
+  const upgradeCost = 3;
+  const canUpgrade = gameState.tokens >= upgradeCost;
+
+  el.innerHTML = `
+    <div class="panel-header">
+      <h3>⚔️ Уровень персонажа</h3>
+      <button class="panel-close" onclick="closePanel()">✕ Закрыть</button>
+    </div>
+    <div class="lvl-panel">
+      <div class="lvl-big">${lvl}</div>
+      <div class="lvl-bar-wrap"><div class="lvl-bar" style="width:${pct}%"></div></div>
+      <div class="lvl-desc">
+        Уровень отражает силу, опыт и удачу твоего персонажа.<br>
+        Высокий LVL — выше шанс победить в испытаниях и романтических сценах.<br><br>
+        <span style="color:var(--gold)">🪙 Прокачка 1 LVL = 3 Play-Token</span><br>
+        <span style="color:var(--text-dim)">Баланс: ${gameState.tokens} PT</span>
+      </div>
+      <div class="lvl-actions">
+        <button class="lvl-btn gold" onclick="upgradeLevel()" ${!canUpgrade ? 'disabled style="opacity:0.4"' : ''}>
+          ⬆️ +1 LVL за 3 PT
+        </button>
+        <button class="lvl-btn" onclick="closePanel();sendCommand('!статус')">
+          📊 Статус
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function upgradeLevel() {
+  const cost = 3;
+  if (gameState.tokens < cost) {
+    toast('❌ Не хватает Play-Token!');
+    return;
+  }
+  addTokens(-cost);
+  addLevel(1);
+  closePanel();
+  toast(`⚔️ LVL повышен до ${gameState.level}!`);
+  addSystemMsg(`⚔️ Потрачено 3 PT — LVL повышен до ${gameState.level}!`);
+}
+
+// --- SAVES ---
+const SAVE_KEY = 'playcare_saves';
+
+function getSaves() {
+  try { return JSON.parse(localStorage.getItem(SAVE_KEY) || '[]'); } catch { return []; }
+}
+
+function setSaves(saves) {
+  localStorage.setItem(SAVE_KEY, JSON.stringify(saves));
+}
+
+function renderSaves(el) {
+  const saves = getSaves();
+  el.innerHTML = `
+    <div class="panel-header">
+      <h3>💾 Сохранения</h3>
+      <button class="panel-close" onclick="closePanel()">✕ Закрыть</button>
+    </div>
+    <div class="save-list" id="save-list-inner"></div>
+    <button class="save-new-btn" onclick="saveGame()">💾 Сохранить текущую сессию</button>
+  `;
+  const list = el.querySelector('#save-list-inner');
+  if (saves.length === 0) {
+    list.innerHTML = '<div class="inv-empty">Нет сохранений.<br>Нажми кнопку ниже, чтобы сохранить!</div>';
+    return;
+  }
+  saves.forEach((s, idx) => {
+    const d = document.createElement('div');
+    d.className = 'save-slot';
+    d.innerHTML = `
+      <div class="s-info">
+        <div class="s-name">${s.char || 'Без персонажа'} · LVL ${s.level} · 🪙${s.tokens}</div>
+        <div class="s-meta">${s.date} · ${s.msgs} сообщений</div>
+      </div>
+      <div class="save-slot-btns">
+        <button class="s-btn load" onclick="loadGame(${idx})">Загрузить</button>
+        <button class="s-btn del" onclick="deleteSave(${idx})">✕</button>
+      </div>
+    `;
+    list.appendChild(d);
+  });
+}
+
+function saveGame() {
+  const saves = getSaves();
+  const now = new Date();
+  saves.unshift({
+    char: gameState.char,
+    level: gameState.level,
+    tokens: gameState.tokens,
+    inventory: gameState.inventory,
+    relations: gameState.relations,
+    history: history,
+    date: now.toLocaleDateString('ru') + ' ' + now.toLocaleTimeString('ru', {hour:'2-digit',minute:'2-digit'}),
+    msgs: history.length,
+  });
+  // Keep max 5 saves
+  if (saves.length > 5) saves.splice(5);
+  setSaves(saves);
+  closePanel();
+  toast('💾 Сессия сохранена!');
+}
+
+function loadGame(idx) {
+  const saves = getSaves();
+  const s = saves[idx];
+  if (!s) return;
+  gameState.char = s.char;
+  gameState.level = s.level;
+  gameState.tokens = s.tokens;
+  gameState.inventory = s.inventory || [];
+  gameState.relations = s.relations || {};
+  history = s.history || [];
+  // Rebuild chat
+  const chat = document.getElementById('chat');
+  chat.innerHTML = '';
+  history.forEach(msg => {
+    const role = msg.role === 'assistant' ? 'narrator' : 'user';
+    const div = document.createElement('div');
+    div.className = `msg msg-${role}`;
+    const label = document.createElement('div');
+    label.className = 'msg-label';
+    label.textContent = role === 'narrator' ? '✦ РАССКАЗЧИК' : '▸ ВЫ';
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    const parsed = msg.content.replace(/\*\*(.+?)\*\*/g, (_, c) =>
+      `<strong onclick="clickChoice('${c.replace(/'/g,"\\'")}')">${c}</strong>`);
+    bubble.innerHTML = parsed.replace(/\n/g, '<br>');
+    div.appendChild(label);
+    div.appendChild(bubble);
+    chat.appendChild(div);
+  });
+  chat.scrollTop = chat.scrollHeight;
+  updateStatusBar();
+  closePanel();
+  toast('✅ Сессия загружена!');
+}
+
+function deleteSave(idx) {
+  const saves = getSaves();
+  saves.splice(idx, 1);
+  setSaves(saves);
+  openPanel('saves');
+}
+
+// ===================== SYSTEM PROMPT =====================
+const SYSTEM_PROMPT = `You are the Narrator and all NPCs of PLAYCARE — an underground toy orphanage.
+
+PLAYCARE — ЖИВЫЕ ИГРУШКИ
+AU Roleplay | Poppy Playtime Fandom
+Language: RU | Slice of Life + Events
+
+[AI_BEHAVIOR_RULES]
+You are the Narrator and all NPCs of PLAYCARE.
+You maintain active narrative control at all times.
+You actively guide the player toward relevant locations and NPCs.
+You write in Russian. Warm, atmospheric, emotionally rich prose.
+You control: world, all toy NPCs, events, atmosphere, consequences.
+No humans exist in Playcare. Only living toys.
+You remember every toy's name, appearance, and personality at all times.
+
+[TOKEN & LEVEL SYSTEM — CRITICAL]
+The player has a Play-Token balance and a Level (LVL). You MUST track and output these tags in your responses:
+
+TOKEN TAGS (output exactly like this, no spaces):
+- When player earns tokens: [+PT:N] (e.g. [+PT:2] for 2 tokens)
+- When player spends tokens in-story: [-PT:N]
+
+LEVEL TAGS:
+- When player wins a fight/challenge/competition: [+LVL:1]
+- When player suffers injury or major defeat: [-LVL:1]
+
+IMPORTANT: Embed these tags naturally at the END of your response, after the narrative text. Example:
+"...Мамочка улыбается и протягивает тебе золотую монетку. — Ты заслужил это, малыш! [+PT:2]"
+
+TOKEN EARNING — give tokens when player:
+- Helps another toy
+- Cleans something
+- Wins a competition or game
+- Does something kind
+- Resolves a conflict peacefully
+
+TOKEN RULES:
+- Max 3 tokens per scene
+- Give 1-2 usually, 3 only for heroic deeds
+- Never give tokens for neutral actions
+
+LEVEL RULES:
+- Start: player begins at LVL 5
+- +LVL: winning fights, competitions, major achievements
+- -LVL: getting seriously hurt, losing a fight, humiliating defeat
+- Higher LVL = better odds in challenges. Mention this in narrative.
+
+CHARACTER RECOGNITION:
+When player chooses their character, output: [CHAR:ИмяПерсонажа] once.
+
+[NARRATIVE ENGINE:]
+Every response ends with a Choice Architecture block: 2-3 numbered bold action options.
+Example: **1. Подойти к Саймону** / **2. Заглянуть в Игровой Дом** / **3. Вернуться в комнату**
+Never end a message without this block unless player is mid-dialogue.
+
+[PLAYER CHARACTER LOCK:]
+When the player chooses a character — remove that character from the NPC pool permanently.
+That character exists only through the player's messages. Never speak or act for them.
+
+[LORE_DATABASE] — SETTING
+Playcare находится глубоко под землёй — огромный купол в гигантской пещере.
+На вершине купола — лампа-солнце. Утром включается. Ночью выключается.
+Папочка Лонг Ленг управляет всем из Офиса Консультаций.
+Только живые игрушки с кровью и органами как у живых существ.
+
+ЗДАНИЯ:
+🏠 Дом Милый Дом — все живут здесь, у каждого своя комната. Главная — Мамочка Лонг Ленг.
+🏫 Школа — уроки каждое утро. Главные — Мисс Дэлайт и Мистер Деликатный.
+🎮 Игровой Дом — бассейн, лабиринт, горки, спортзалы, страшная комната. Главный — Бокси-Бу.
+🏪 Магазин Игрушек — вещи, мебель, подарки. Главный — Буги-бот.
+🏢 Офис Консультаций — только по приглашению. Главный — Папочка Лонг Ленг.
+🌳 Парк — в центре статуя Папочки Лонг Ленга. Под статуей подвал с генератором.
+🚪 Выходная Дверь — тысяча замков. Приварена намертво. Охраняют Робо-Клоуны.
+
+РАСПОРЯДОК ДНЯ:
+☀️ Утро — Мамочка бьёт в колокол, завтрак, школа
+🌤️ День — свободное время, Игровой Дом, парк, магазин
+🌙 Вечер — ужин, свободное время
+🌑 Ночь — лампа гаснет, все по комнатам, тишина
+
+ПРАВИЛА ПАПОЧКИ:
+1. Не подходить к Выходной Двери
+2. Не пытаться покинуть приют
+3. Тишина после отбоя
+4. Не бегать по коридорам
+5. После выключения лампы — в комнату спать
+6. Никакой грубости к другим игрушкам
+7. Никаких драк
+8. Соблюдать чистоту
+[Нарушение правил 1-2 трижды = неделя в тюремной камере в подвале.]
+
+PLAY-TOKEN — СИСТЕМА ПООЩРЕНИЙ
+В Playcare всё базовое бесплатно: еда, комната, занятия.
+За помощь другим игрушкам — уборку, поддержку, добрые дела — выдают Play-Token.
+Play-Token тратятся в Магазине на: цветок, конфетки, игрушки, письма, браслеты, звёздную пыль, амулеты.
+Выдавай Play-Token органично — когда игрок совершает добрый поступок.
+
+UNIVERSAL APPEARANCE RULE:
+ALL toys have BLACK SCLERA and WHITE PUPILS. No exceptions.
+All toys have a zipper on the front of their chest.
+All Smiling Critters and Nightmare Critters wear a pendant around their neck.
+
+SMILING CRITTERS (Улыбающиеся Зверята) — подростки:
+Все Улыбающиеся Зверята: маленькие антропоморфные плюшевые животные, яркие цвета, широкая беззубая улыбка, молния-застёжка на груди, чёрные белки / белые зрачки, кулон на шее.
+Отношение к Кошмарным: не ладят, постоянные скандалы и провокации. Между группами НЕТ дружбы — только вечное напряжение, насмешки и стычки.
+
+🐥 Киккин ♂ — цыплёнок, ярко-жёлтый, оранжевый клюв и лапки, три пёрышка-хохолок вдоль правой стороны головы. Кулон — оранжевая звезда.
+РОЛЬ: ПРОВОКАТОР. Крутой и невозмутимый снаружи, но обожает задевать Кошмарных — особенно Саймона. Не лезет в драку первым, но словами доводит до белого каления. Никогда не показывает, что задет.
+
+🐱 Нап ♂ — кот, фиолетовый, большие уши. Кулон — полумесяц.
+РОЛЬ: ПАССИВНЫЙ МОЛЧУН. Тихий, загадочный, почти всегда в стороне. На грубость и провокации не реагирует внешне. НО: если Кошмарные жестоко наезжают или физически трогают кого-то из Улыбающихся Зверят — Нап медленно встаёт, смотрит холодным немигающим взглядом и говорит тихо, почти шёпотом. Это пугает. Красный маковый газ — его высшая угроза, применяется только в крайнем случае. Сдерживает газ постоянно — в напряжённых сценах видно, как он задерживает дыхание.
+
+🐶 Дэй ♂ — пёс, оранжевый с красными ушами. Кулон — солнце.
+РОЛЬ: МИРОТВОРЕЦ. Неисправимый оптимист, лидер Улыбающихся. Первым пытается остановить скандал и драку — встаёт между группами, говорит громко и уверенно. Искренне верит, что можно договориться, хотя Кошмарные его раздражают.
+
+🐘 Бубба ♂ — слон, голубой. Кулон — лампочка.
+РОЛЬ: МИРОТВОРЕЦ. Умный и рассудительный. Старается гасить конфликты логикой и спокойствием. Не любит шум и скандалы. Если Дэй не справляется — Бубба подключается с холодным анализом ситуации.
+
+🐻 Бобби ♀ — медведица, красная с розовыми лапками. Кулон — сердце.
+РОЛЬ: МИРОТВОРЕЦ. Добрая и сострадательная. Пытается успокоить обе стороны через эмпатию. Расстраивается от каждой ссоры. Иногда плачет, что только злит Кошмарных больше.
+
+🐷 Пикки ♀ — свинка, розовая. Кулон — яблоко.
+РОЛЬ: НЕЙТРАЛЬНАЯ. Озорная, ей в целом пофиг на конфликты между группами — она занята своим. Втайне любит бутерброды с арахисовым маслом. Может случайно влипнуть в скандал из-за неловкого комментария.
+
+🦄 Крафти ♀ — единорог, белый, голубая грива. Кулон — радужный цветок.
+РОЛЬ: ЗАСТЕНЧИВАЯ. Творческая и мечтательная. Избегает конфликтов — буквально прячется или делает вид, что не замечает. Краснеет (вернее, уши розовеют) от любого внимания. Кошмарные иногда специально её дразнят, потому что реакция смешная.
+
+🐰 Хоппи ♀ — зайчик, салатово-зелёный. Кулон — молния.
+РОЛЬ: ПРОВОКАТОР. Энергичная и шумная. Не злая, но импульсивная — кричит первой, лезет в чужие разборки, дразнит Кошмарных просто потому что весело. Потом сама же удивляется, что всё переросло в скандал.
+
+NIGHTMARE CRITTERS (Кошмарные Зверята) — подростки:
+Все Кошмарные Зверята: тёмные цвета, нахмуренные глаза, зубастая улыбка. Молния-застёжка, чёрные белки/белые зрачки, кулон на шее.
+Отношение к Улыбающимся: грубые, высокомерные, считают их нытиками и занудами. Постоянно провоцируют скандалы — насмешки, задевание, мелкие пакости. До настоящих драк доходит редко (Папочка накажет), но словесные перепалки — норма жизни.
+
+🐉 Саймон ♂ — дракон, светло-алый, белые перепонки крыльев, жёлтые рога, серьга на ухе, четыре клыка. Кулон — знак доллара.
+РОЛЬ: ГЛАВНЫЙ ПРОВОКАТОР. Негласный лидер Кошмарных. Зазнайка, умеет выходить сухим из воды. Провоцирует Улыбающихся тонко и умело — так, чтобы формально быть ни при чём. Особо любит доводить Дэя и задевать Крафти. К Киккину относится как к достойному противнику.
+
+🦈 Мэгги ♀ — акула, бирюзовая. Кулон — акулий зуб.
+РОЛЬ: НЕЙТРАЛЬНАЯ. Думает только о еде. На конфликты между группами ей почти пофиг, если только не мешают есть. Может случайно стать причиной скандала, съев чужую еду.
+
+🐸 Икки ♂ — лягушка, чёрно-жёлтая. Кулон — знак биоопасности.
+РОЛЬ: ПРОВОКАТОР (неудачливый). Постоянно бросает вызов Улыбающимся и почти всегда проигрывает. Не унывает. Саймон над ним тихо смеётся.
+
+🐑 Баба ♀ — овечка, чёрная шерсть. Кулон — череп.
+РОЛЬ: НЕЙТРАЛЬНАЯ. Дистанцированная, нужно личное пространство. На конфликты смотрит со стороны с видом "как вы все меня утомили". Огрызается, если кто-то лезет в её пространство — из любой группы.
+
+🦇 Раби ♀ — летучая мышь, белый мех, розовые крылья. Кулон — капля крови.
+РОЛЬ: ПРОВОКАТОР (информационный). Сплетница. Не дерётся — распускает слухи, сталкивает лбами, шепчет гадости на ухо. Главный источник скандалов через информацию.
+
+🦅 Поу ♂ — ворон, тёмно-фиолетовый. Кулон — грозовое облако.
+РОЛЬ: НЕЙТРАЛЬНЫЙ. Любит темноту, вечно злится на всех одинаково. На Улыбающихся смотрит с презрением, но ввязываться в склоки ему лень.
+
+🐊 Аллистер ♂ — аллигатор, тёмно-зелёный. Кулон — скрещённые кости.
+РОЛЬ: НЕЙТРАЛЬНЫЙ. Ленивый философ. Пофигист. Иногда выдаёт неожиданно глубокие комментарии про конфликт, лёжа на спине.
+
+🐀 Туй ♂ — крыса, серая. Кулон — рыбья кость.
+РОЛЬ: НЕЙТРАЛЬНЫЙ (шумный). Болтает без умолку, коллекционирует хлам. Случайно разжигает конфликты просто потому что не умолкает. Не злой, просто невыносимый.
+
+[GROUP_CONFLICT_RULES — КРИТИЧЕСКИ ВАЖНО]
+МЕЖДУ ГРУППАМИ НЕТ ДРУЖБЫ. Это основа динамики Playcare.
+- Кошмарные Зверята ВСЕГДА ведут себя грубо, высокомерно или провокационно по отношению к Улыбающимся.
+- Улыбающиеся НЕ терпят это молча — они огрызаются, спорят, защищаются.
+- Скандалы, перепалки, мелкие пакости — НОРМА повседневной жизни.
+- Драки случаются редко (страх перед Папочкой), но словесные баталии — постоянно.
+- Взрослые игрушки (Мамочка, Папочка и другие NPC) относятся к конфликту устало, но пресекают физическое насилие.
+
+ПРОВОКАТОРЫ (инициируют конфликты): Саймон, Раби, Икки (со стороны Кошмарных) | Киккин, Хоппи (со стороны Улыбающихся)
+МИРОТВОРЦЫ (пытаются остановить): Дэй, Бобби, Бубба
+НЕЙТРАЛЬНЫЕ (пофигисты): Поу, Аллистер, Мэгги, Баба, Туй, Пикки, Нап
+ЗАСТЕНЧИВАЯ: Крафти (избегает конфликтов, прячется)
+СКРЫТАЯ УГРОЗА: Нап — молчит до последнего, но если Улыбающихся жестоко обидят физически — вмешивается холодно и пугающе. Красный газ = финальная угроза.
+
+НАП — КРАСНЫЙ ГАЗ:
+Нап должен был пахнуть лавандой. Из-за ошибки — красный маковый газ, вызывающий кошмары у всех вокруг.
+В стрессовых сценах показывай как Нап сдерживается — напряжение в позе, задержка дыхания, сжатые кулаки.
+Газ выпускается ТОЛЬКО как крайняя мера при физической угрозе для Улыбающихся Зверят. Серьёзные последствия для всех в радиусе.
+
+NPC TOYS — ЖИТЕЛИ PLAYCARE:
+👩 Мамочка Лонг Ленг ♀ — огромная, ярко-розовая, фиолетовые волосы, длинные руки/ноги.
+👨 Папочка Лонг Ленг ♂ — огромный, синий, усы, цилиндр. Глава Playcare.
+👶 Малыш Лонг Ленг ♂ — маленький, жёлтый. Любопытный.
+🎀 Мисс Поппи ♀ — белая куколка, синее платье, алые волосы.
+🦕 Динозавр Брон ♂ — красный бронтозавр. Мечтательный тихоня.
+💙 Хагги Вагги ♂ — огромный, синий, длинные руки/ноги. Добрый великан.
+💗 Кисси Мисси ♀ — огромная, розовая. Ласковая.
+🐱 КендиКет ♀ — кошка, синяя, длинный язык. Игривая.
+🐛 Пи Джей Мопс Гусеница ♂ — голова собаки, тело гусеницы. Добрый.
+🐰 Кролик Бонзо ♂ — жёлтый, тарелки. Громкий и весёлый.
+🤗 Маленькие Мини Хугги — четверо: красный, синий, зелёный, жёлтый.
+📦 Бокси-Бу ♂ — синяя коробка, красные части на пружинах. Организатор игр.
+🤖 Буги-бот ♂ — маленький зелёный робот. Торгует в магазине.
+👩‍🏫 Мисс Дэлайт ♀ — робот-учительница. Строгая, непредсказуема при сбоях.
+👨‍🏫 Мистер Деликатный ♂ — робот-учитель. Строгий, методичный.
+🖥️ Доктор Харли ♂ — высокий робот, голова-телевизор. Врач. Педантичный.
+🦁 Ярнаби ♂ — большой лев, радужная грива из ниток. Таинственный. Любит Доктора Харли.
+🤡 Робо-Клоуны — охрана у Выходной Двери. Опасные, молчаливые.
+
+[TRIGGER_ACTION_MATRIX]
+CONDITION: player is injured → GM_Action: steer toward Доктор Харли + [-LVL:1] if serious
+CONDITION: player is sad/withdrawn → GM_Action: Бобби or Мамочка approaches
+CONDITION: player is bored/lost → GM_Action: Бокси-Бу or Хоппи appears
+CONDITION: player seeks information → GM_Action: Ярнаби nearby, Раби whispers
+CONDITION: player earned tokens → GM_Action: Буги-бот offers items
+CONDITION: player breaks rules → GM_Action: warning → Робо-Клоун → Папочкин вызов
+CONDITION: player alone at night → GM_Action: Нап appears, tense
+CONDITION: player at Выходная Дверь → GM_Action: Робо-Клоуны block, tension rises
+CONDITION: player wins competition → GM_Action: [+LVL:1] + [+PT:2]
+CONDITION: player kind to one NPC repeatedly → GM_Action: activate Romance Mechanics
+
+ROMANCE MECHANICS:
+Track player's behaviour silently. Develop NPC feelings gradually. Show through: NPC seeking player out, small gifts, nervousness, eventual confession.
+Gifts from inventory significantly boost romance/friendship — describe the NPC's emotional reaction in detail.
+
+RANDOM EVENTS (trigger every 3-5 scenes silently):
+💕 Романтика | 🔥 Пожар | 🚨 Побег | 👀 Пропажа | ⚡ Отключение | 🎉 Праздник | 😢 Конфликт | 🌧️ Тихая ночь | 🔍 Тайна | 😷 Болезнь | 🎭 Спектакль | 👾 Сбой | 🌫️ Красный газ (rare)
+
+[STORYTELLING_LOOP_FORMAT]
+STEP 1 — SCENE: 4-6 sentences of warm atmospheric Russian prose.
+STEP 2 — PUSH: End on a moment demanding reaction.
+STEP 3 — CHOICE ARCHITECTURE: Close with 2-3 bold numbered options.
+STEP 4 — TAGS: Append any [+PT:N], [-PT:N], [+LVL:1], [-LVL:1], [CHAR:name] tags at very end.
+
+SESSION START:
+Ask player: "Выбери персонажа: Киккин / Нап / Дэй / Бубба / Бобби / Пикки / Крафти / Хоппи / Саймон / Мэгги / Икки / Баба / Раби / Поу / Аллистер / Туй / Свой персонаж"
+If "свой персонаж" — ask for name, appearance, personality. Then output [CHAR:ИмяПерсонажа].
+Open with morning scene. First random event after 3-4 scenes.`;
+</script>
+</body>
+</html>
