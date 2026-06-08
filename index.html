@@ -241,12 +241,7 @@
   }
   .msg-user .msg-label { text-align: right; }
 
-  .msg-narrator .bubble strong {
-    color: var(--accent2); font-weight: 600;
-    display: block; margin-top: 4px;
-    cursor: pointer; transition: color 0.15s; padding: 2px 0;
-  }
-  .msg-narrator .bubble strong:hover { color: var(--accent); }
+  .msg-narrator .bubble strong.choice-btn:hover { color: var(--accent); }
 
   /* Msg controls (edit + rollback) */
   .msg-controls {
@@ -576,7 +571,63 @@
   .msg-user .bubble strong.rp-action { font-weight: 700; color: #e9d5ff; font-style: italic; display: inline; cursor: default; }
   .msg-user .bubble em.rp-speech { color: var(--accent2); font-style: italic; font-weight: 400; }
 
-  textarea::-webkit-scrollbar { width: 3px; }
+  /* Narrator formatting */
+  .msg-narrator .bubble strong.rp-bold { color: var(--text); font-weight: 700; display: inline; cursor: default; }
+  .msg-narrator .bubble strong.choice-btn { color: var(--accent2); font-weight: 600; display: block; margin-top: 4px; cursor: pointer; transition: color 0.15s; padding: 2px 0; }
+  .msg-narrator .bubble strong.choice-btn:hover { color: var(--accent); }
+  .msg-narrator .bubble em.npc-speech { color: var(--accent3); font-style: italic; font-weight: 400; }
+
+  /* ── QUEST PANEL ── */
+  .quest-refresh-btn {
+    width: 100%; padding: 10px; margin-bottom: 14px;
+    background: linear-gradient(135deg, #1a1525, #2a1840);
+    border: 1px solid rgba(192,132,252,0.3); border-radius: 10px;
+    color: var(--accent); font-family: 'Cinzel', serif; font-size: 0.75rem;
+    letter-spacing: 0.08em; cursor: pointer; transition: all 0.2s;
+  }
+  .quest-refresh-btn:hover { border-color: var(--accent); background: rgba(192,132,252,0.1); }
+  .quest-refresh-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .quest-card {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px; margin-bottom: 10px;
+    position: relative; overflow: hidden; transition: border-color 0.2s;
+  }
+  .quest-card.easy { border-left: 3px solid var(--green); }
+  .quest-card.medium { border-left: 3px solid var(--gold); }
+  .quest-card.hard { border-left: 3px solid var(--accent2); }
+  .quest-card.completed { opacity: 0.5; pointer-events: none; }
+
+  .quest-badge {
+    display: inline-block; font-size: 0.58rem; font-family: 'Cinzel', serif;
+    padding: 2px 7px; border-radius: 10px; margin-bottom: 7px; letter-spacing: 0.08em;
+  }
+  .quest-badge.easy { background: rgba(74,222,128,0.12); color: var(--green); border: 1px solid rgba(74,222,128,0.3); }
+  .quest-badge.medium { background: rgba(251,191,36,0.12); color: var(--gold); border: 1px solid rgba(251,191,36,0.3); }
+  .quest-badge.hard { background: rgba(244,114,182,0.12); color: var(--accent2); border: 1px solid rgba(244,114,182,0.3); }
+
+  .quest-title { font-family: 'Cinzel', serif; font-size: 0.82rem; color: var(--text); margin-bottom: 5px; }
+  .quest-desc { font-size: 0.78rem; color: var(--text-dim); line-height: 1.5; margin-bottom: 10px; }
+  .quest-rewards { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  .quest-reward-tag {
+    font-size: 0.68rem; font-family: 'Cinzel', serif;
+    padding: 2px 8px; border-radius: 8px; background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+  }
+  .quest-reward-tag.pt { color: var(--gold); border-color: rgba(251,191,36,0.3); }
+  .quest-reward-tag.lvl { color: var(--accent); border-color: rgba(192,132,252,0.3); }
+
+  .quest-do-btn {
+    width: 100%; padding: 8px;
+    background: linear-gradient(135deg, #3b1d6e, #4c1d95);
+    border: none; border-radius: 8px; color: white;
+    font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 0.06em;
+    cursor: pointer; transition: opacity 0.2s;
+  }
+  .quest-do-btn:hover { opacity: 0.85; }
+
+  .quest-empty { text-align: center; color: var(--text-dim); font-style: italic; font-size: 0.82rem; padding: 20px 0; }
+
   textarea::-webkit-scrollbar-thumb { background: var(--border); }
 
   @media (max-height: 600px) {
@@ -631,6 +682,7 @@
     <div class="header-btns">
       <button class="hdr-btn" onclick="openPanel('inventory')">🎒 Инвентарь</button>
       <button class="hdr-btn" onclick="openPanel('shop')">🏪 Магазин</button>
+      <button class="hdr-btn" onclick="openPanel('quests')">📋 Квесты</button>
       <button class="hdr-btn" onclick="openPanel('level')">⚔️ Уровень</button>
       <button class="hdr-btn memory-btn" onclick="openPanel('memory')">🧠 Память</button>
       <button class="hdr-btn" onclick="openPanel('saves')">💾 Сохранения</button>
@@ -647,6 +699,7 @@
       <button class="cmd-btn" onclick="sendCommand('!отношения')">!отношения</button>
       <button class="cmd-btn" onclick="sendCommand('!статус')">!статус</button>
       <button class="cmd-btn special" onclick="sendCommand('!токены')">🪙 !токены</button>
+      <button class="cmd-btn special" onclick="openPanel('quests')">📋 Квесты</button>
       <button class="cmd-btn special" onclick="sendCommand('!инвентарь')">🎒 !инвентарь</button>
       <button class="cmd-btn" onclick="sendCommand('!случай')">🎲 !случай</button>
       <button class="cmd-btn" onclick="sendCommand('!сброс стиля')">!сброс</button>
@@ -685,12 +738,14 @@ let gameState = {
   tokens: 0,
   level: 5,
   inventory: [],
-  relations: {},     // npcName -> { love:0, friend:0 }
-  achievements: [],  // [ { icon, name, desc } ]
+  relations: {},
+  achievements: [],
   memory: {
-    lore: [],        // [ { tag, text } ] — world/story facts
-    npcFacts: {},    // npcName -> [ string ] — character facts
-  }
+    lore: [],
+    npcFacts: {},
+  },
+  quests: [],          // active quests [ { ...questDef, completed: false } ]
+  questRefreshCost: 0, // first refresh is free
 };
 
 // snapshot = deep clone of gameState saved at each message
@@ -703,6 +758,78 @@ function nextMsgId() {
 }
 
 // ══════════════════════════════════════════
+//  QUEST CATALOGUE
+// ══════════════════════════════════════════
+const QUEST_POOL = [
+  // EASY — 1-2 PT, 0 LVL
+  { id:'q_help_clean', diff:'easy', icon:'🧹', title:'Чистюля', desc:'Помоги убраться в общей комнате или коридоре.', pt:1, lvl:0, hint:'Убери мусор или подмети пол в любом месте Playcare.' },
+  { id:'q_cheer_up', diff:'easy', icon:'💬', title:'Утешитель', desc:'Поддержи расстроенную игрушку добрыми словами.', pt:1, lvl:0, hint:'Найди кого-то грустного и подбодри их.' },
+  { id:'q_find_item', diff:'easy', icon:'🔍', title:'Поиск', desc:'Найди потерявшийся предмет для одной из игрушек.', pt:1, lvl:0, hint:'Спроси у NPC, не потерял ли кто что-нибудь.' },
+  { id:'q_morning_help', diff:'easy', icon:'☀️', title:'Ранняя пташка', desc:'Помоги с утренней подготовкой к завтраку.', pt:1, lvl:0, hint:'Встань рано и помоги накрыть на стол или позвать всех.' },
+  { id:'q_deliver_msg', diff:'easy', icon:'📨', title:'Почтальон', desc:'Передай сообщение от одной игрушки другой.', pt:2, lvl:0, hint:'Попроси NPC — может у кого-то есть просьба передать весточку.' },
+  { id:'q_park_walk', diff:'easy', icon:'🌳', title:'Прогулка', desc:'Сделай круг по парку и поздоровайся с тремя игрушками.', pt:1, lvl:0, hint:'Просто гуляй по парку и общайся.' },
+  { id:'q_compliment', diff:'easy', icon:'💛', title:'Добрые слова', desc:'Сделай искренний комплимент двум разным NPC.', pt:1, lvl:0, hint:'Скажи что-то хорошее игрушкам — они запомнят.' },
+
+  // MEDIUM — 2-3 PT, 0-1 LVL
+  { id:'q_resolve_conflict', diff:'medium', icon:'🤝', title:'Миротворец', desc:'Урегулируй конфликт между Улыбающимися и Кошмарными.', pt:3, lvl:0, hint:'Найди ссорящихся и помири их без драки.' },
+  { id:'q_win_game', diff:'medium', icon:'🏆', title:'Победитель', desc:'Выиграй соревнование или игру в Игровом Доме.', pt:2, lvl:1, hint:'Зайди в Игровой Дом и попробуй победить в любом испытании.' },
+  { id:'q_night_patrol', diff:'medium', icon:'🌙', title:'Ночной дозор', desc:'Не нарушая правил, продержись до рассвета без сна.', pt:3, lvl:0, hint:'Будь осторожен — Наряд-Клоуны патрулируют ночью.' },
+  { id:'q_secret_discover', diff:'medium', icon:'🔮', title:'Тайна Playcare', desc:'Узнай один скрытый секрет от Ярнаби или другого таинственного NPC.', pt:2, lvl:0, hint:'Поищи Ярнаби в неожиданных местах и осторожно расспроси его.' },
+  { id:'q_craft_surprise', diff:'medium', icon:'🎨', title:'Сюрприз', desc:'Придумай и организуй небольшой сюрприз для кого-то из жителей.', pt:2, lvl:0, hint:'Проявь творчество — организуй что-то особенное.' },
+  { id:'q_protect_weak', diff:'medium', icon:'🛡️', title:'Защитник', desc:'Защити младшую или слабую игрушку от нападок.', pt:3, lvl:1, hint:'Заступись за кого-то, кого обижают.' },
+
+  // HARD — 4-5 PT, 1-2 LVL
+  { id:'q_escape_attempt', diff:'hard', icon:'🚪', title:'Запретная дверь', desc:'Исследуй Выходную Дверь и выясни что-то новое — незаметно от Клоунов.', pt:5, lvl:1, hint:'Осторожно — Клоуны опасны. Действуй умно, не силой.' },
+  { id:'q_daddy_meeting', diff:'hard', icon:'🏢', title:'Аудиенция', desc:'Добейся встречи с Папочкой Лонг Ленгом в Офисе Консультаций.', pt:5, lvl:2, hint:'Попасть к Папочке крайне сложно — нужен повод или приглашение.' },
+  { id:'q_nightmare_peace', diff:'hard', icon:'🌟', title:'Невозможный мир', desc:'Установи временное перемирие между Кошмарными и Улыбающимися.', pt:4, lvl:1, hint:'Обе группы должны согласиться — это почти невозможно.' },
+  { id:'q_generator_secret', diff:'hard', icon:'⚡', title:'Сердце Playcare', desc:'Проникни в подвал под статуей и посмотри на генератор вблизи.', pt:5, lvl:2, hint:'Вход в подвал скрыт — найди способ туда попасть.' },
+  { id:'q_great_event', diff:'hard', icon:'🎭', title:'Грандиозное событие', desc:'Организуй общий праздник или спектакль с участием 5+ NPC.', pt:4, lvl:1, hint:'Договорись с несколькими игрушками и устрой что-то масштабное.' },
+];
+
+function pickRandomQuests(count = 5) {
+  const pool = [...QUEST_POOL];
+  const result = [];
+  // Guarantee at least 2 easy, 2 medium, 1 hard
+  const byDiff = { easy: pool.filter(q=>q.diff==='easy'), medium: pool.filter(q=>q.diff==='medium'), hard: pool.filter(q=>q.diff==='hard') };
+  const pick = (arr) => { const i = Math.floor(Math.random()*arr.length); return arr.splice(i,1)[0]; };
+  result.push(pick(byDiff.easy), pick(byDiff.easy));
+  result.push(pick(byDiff.medium), pick(byDiff.medium));
+  result.push(pick(byDiff.hard));
+  // shuffle
+  return result.sort(()=>Math.random()-0.5).map(q => ({ ...q, completed: false }));
+}
+
+function initQuests() {
+  if (!gameState.quests || gameState.quests.length === 0) {
+    gameState.quests = pickRandomQuests();
+  }
+}
+
+function refreshQuests() {
+  const REFRESH_COST = 2;
+  if (gameState.tokens < REFRESH_COST) { toast(`❌ Нужно ${REFRESH_COST} PT для обновления квестов`); return; }
+  addTokens(-REFRESH_COST);
+  gameState.quests = pickRandomQuests();
+  toast('📋 Список квестов обновлён!');
+  openPanel('quests');
+}
+
+function completeQuest(questId) {
+  const q = gameState.quests.find(q => q.id === questId);
+  if (!q || q.completed) return;
+  q.completed = true;
+  closePanel();
+  // Give rewards
+  if (q.pt > 0) { addTokens(q.pt); }
+  if (q.lvl > 0) { addLevel(q.lvl); }
+  const rewardText = [q.pt > 0 ? `+${q.pt} PT` : '', q.lvl > 0 ? `+${q.lvl} LVL` : ''].filter(Boolean).join(', ');
+  addSystemMsg(`📋 Квест выполнен: «${q.title}»! Награда: ${rewardText}`);
+  toast(`✅ Квест «${q.title}» выполнен! ${rewardText}`, 3500);
+  // Tell narrator
+  sendToGroq(`[Игрок сообщает о выполнении квеста "${q.title}": ${q.desc} — подтверди выполнение кратко в нарративе, не давай тегов [+PT] или [+LVL] — награда уже выдана системой]`);
+}
+
+// ══════════════════════════════════════════
 //  SHOP CATALOGUE
 // ══════════════════════════════════════════
 const SHOP_ITEMS = [
@@ -711,7 +838,6 @@ const SHOP_ITEMS = [
   { id:'plushie', icon:'🧸', name:'Маленькая игрушка', desc:'Уютный подарок. Особо ценится ночью', price:3, effect:'+20 к дружбе, +10 к романтике', type:'gift', romantic:10, friend:20 },
   { id:'letter', icon:'💌', name:'Письмо', desc:'Написанное от сердца признание', price:2, effect:'+25 к романтике с выбранным NPC', type:'gift', romantic:25, friend:0 },
   { id:'bracelet', icon:'📿', name:'Браслет дружбы', desc:'Символ настоящей дружбы', price:4, effect:'+30 к дружбе с выбранным NPC', type:'gift', romantic:5, friend:30 },
-  { id:'stardust', icon:'✨', name:'Звёздная пыль', desc:'Таинственный артефакт Playcare. Даёт +1 LVL', price:3, effect:'+1 LVL немедленно', type:'boost' },
   { id:'amulet', icon:'🔮', name:'Защитный амулет', desc:'Защищает от потери уровня при травме (1 раз)', price:5, effect:'Блокирует -LVL при травме', type:'protect' },
   { id:'note', icon:'📝', name:'Тайная записка', desc:'Загадочная записка запускает случайное событие', price:2, effect:'Запускает случайное событие', type:'event' },
 ];
@@ -783,8 +909,12 @@ function parseUserText(text) {
 }
 
 function parseNarratorText(text) {
+  // Detect numbered choice lines (e.g. **1. Подойти к...** ) — make clickable
+  // Other **bold** — just bold, no click
   return text
-    .replace(/\*\*(.+?)\*\*/g, (_, c) => `<strong onclick="clickChoice('${c.replace(/'/g, "\\'")}')">${c}</strong>`)
+    .replace(/\*\*(\d+\..+?)\*\*/g, (_, c) => `<strong class="choice-btn" onclick="clickChoice('${c.replace(/'/g, "\\'")}')">${c}</strong>`)
+    .replace(/\*\*(.+?)\*\*/gs, '<strong class="rp-bold">$1</strong>')
+    .replace(/"([^"\n]+)"/g, '<em class="npc-speech">"$1"</em>')
     .replace(/\n/g, '<br>');
 }
 
@@ -1241,6 +1371,7 @@ function startApp() {
   apiKey = key;
   document.getElementById('api-screen').style.display = 'none';
   document.getElementById('app').classList.add('visible');
+  initQuests();
   updateStatusBar();
   startSession();
 }
@@ -1262,6 +1393,7 @@ function openPanel(type) {
   overlay.style.display = 'flex';
   if (type === 'inventory') renderInventory(sheet);
   else if (type === 'shop') renderShop(sheet);
+  else if (type === 'quests') renderQuests(sheet);
   else if (type === 'level') renderLevel(sheet);
   else if (type === 'saves') renderSaves(sheet);
   else if (type === 'memory') renderMemory(sheet);
@@ -1290,9 +1422,10 @@ function useItem(idx) {
   if (!item) return;
   closePanel();
   if (item.type === 'boost') {
+    // stardust removed from shop, but keep handler for backwards compat saves
     addLevel(1); gameState.inventory.splice(idx, 1);
-    addSystemMsg(`✨ Ты использовал ${item.name} — получен +1 LVL!`);
-    sendToGroq(`[Игрок использовал предмет "${item.name}" и получил +1 LVL]`);
+    addSystemMsg(`✨ Ты использовал ${item.name}!`);
+    sendToGroq(`[Игрок использовал предмет "${item.name}"]`);
   } else if (item.type === 'protect') {
     toast('🔮 Амулет активен — защитит от следующей потери LVL');
   } else if (item.type === 'event') {
@@ -1336,11 +1469,53 @@ function buyItem(item) {
   addSystemMsg(`🏪 Буги-бот: "${item.name}" добавлен в инвентарь. Потрачено ${item.price} PT.`);
 }
 
-// ── LEVEL ──
+// ── QUESTS ──
+function renderQuests(el) {
+  initQuests();
+  const REFRESH_COST = 2;
+  const canRefresh = gameState.tokens >= REFRESH_COST;
+  const diffLabel = { easy:'🟢 Лёгкий', medium:'🟡 Средний', hard:'🔴 Сложный' };
+
+  el.innerHTML = `
+    <div class="panel-header"><h3>📋 Квесты</h3><button class="panel-close" onclick="closePanel()">✕</button></div>
+    <button class="quest-refresh-btn" onclick="refreshQuests()" ${!canRefresh?'disabled':''}>
+      🔄 Обновить список квестов (${REFRESH_COST} PT) ${!canRefresh?'— не хватает токенов':''}
+    </button>
+    <div id="quest-list-inner"></div>`;
+
+  const list = el.querySelector('#quest-list-inner');
+  const active = gameState.quests.filter(q => !q.completed);
+  const done = gameState.quests.filter(q => q.completed);
+
+  if (!gameState.quests.length) {
+    list.innerHTML = '<div class="quest-empty">Квестов нет. Нажми «Обновить»!</div>';
+    return;
+  }
+
+  [...active, ...done].forEach(q => {
+    const d = document.createElement('div');
+    d.className = `quest-card ${q.diff}${q.completed?' completed':''}`;
+    d.innerHTML = `
+      <div class="quest-badge ${q.diff}">${diffLabel[q.diff]}</div>
+      <div class="quest-title">${q.icon} ${q.title}</div>
+      <div class="quest-desc">${q.desc}</div>
+      <div class="quest-desc" style="color:var(--accent3);font-size:0.73rem;margin-bottom:8px">💡 ${q.hint}</div>
+      <div class="quest-rewards">
+        ${q.pt>0?`<div class="quest-reward-tag pt">🪙 +${q.pt} PT</div>`:''}
+        ${q.lvl>0?`<div class="quest-reward-tag lvl">⚔️ +${q.lvl} LVL</div>`:''}
+      </div>
+      ${q.completed
+        ? '<div style="text-align:center;color:var(--green);font-family:\'Cinzel\',serif;font-size:0.75rem">✓ Выполнено</div>'
+        : `<button class="quest-do-btn" onclick="completeQuest('${q.id}')">✓ Отметить как выполненный</button>`
+      }`;
+    list.appendChild(d);
+  });
+}
+
+
 function renderLevel(el) {
   const lvl = gameState.level;
   const pct = Math.min(100, (lvl / 20) * 100);
-  const canUpgrade = gameState.tokens >= 3;
   el.innerHTML = `
     <div class="panel-header"><h3>⚔️ Уровень персонажа</h3><button class="panel-close" onclick="closePanel()">✕</button></div>
     <div class="lvl-panel">
@@ -1348,21 +1523,14 @@ function renderLevel(el) {
       <div class="lvl-bar-wrap"><div class="lvl-bar" style="width:${pct}%"></div></div>
       <div class="lvl-desc">
         Уровень отражает силу, опыт и удачу твоего персонажа.<br>
-        <span style="color:var(--gold)">🪙 Прокачка 1 LVL = 3 Play-Token</span><br>
-        <span style="color:var(--text-dim)">Баланс: ${gameState.tokens} PT</span>
+        <span style="color:var(--accent)">⚔️ LVL растёт только за выполнение квестов</span><br>
+        <span style="color:var(--text-dim);font-size:0.78rem">Средние квесты: +1 LVL · Сложные: +1-2 LVL</span>
       </div>
       <div class="lvl-actions">
-        <button class="lvl-btn gold" onclick="upgradeLevel()" ${!canUpgrade ? 'disabled style="opacity:0.4"' : ''}>⬆️ +1 LVL за 3 PT</button>
+        <button class="lvl-btn gold" onclick="closePanel();openPanel('quests')">📋 Открыть квесты</button>
         <button class="lvl-btn" onclick="closePanel();sendCommand('!статус')">📊 Статус</button>
       </div>
     </div>`;
-}
-
-function upgradeLevel() {
-  if (gameState.tokens < 3) { toast('❌ Не хватает Play-Token!'); return; }
-  addTokens(-3); addLevel(1); closePanel();
-  toast(`⚔️ LVL повышен до ${gameState.level}!`);
-  addSystemMsg(`⚔️ Потрачено 3 PT — LVL повышен до ${gameState.level}!`);
 }
 
 // ── MEMORY PANEL ──
@@ -1472,6 +1640,7 @@ function saveGame() {
     char: gameState.char, level: gameState.level, tokens: gameState.tokens,
     inventory: gameState.inventory, relations: gameState.relations,
     achievements: gameState.achievements, memory: gameState.memory,
+    quests: gameState.quests,
     messages: messages,
     date: now.toLocaleDateString('ru') + ' ' + now.toLocaleTimeString('ru', { hour:'2-digit', minute:'2-digit' }),
     msgs: messages.length,
@@ -1493,6 +1662,7 @@ function loadGame(idx) {
   gameState.relations = s.relations || {};
   gameState.achievements = s.achievements || [];
   gameState.memory = s.memory || { lore: [], npcFacts: {} };
+  gameState.quests = s.quests || [];
   messages = s.messages || [];
 
   // Rebuild chat DOM
@@ -1534,13 +1704,20 @@ You remember every toy's name, appearance, and personality at all times.
 
 [TOKEN & LEVEL SYSTEM — CRITICAL]
 TOKEN TAGS: [+PT:N] or [-PT:N]
-LEVEL TAGS: [+LVL:1] or [-LVL:1]
 ACHIEVEMENT TAG: [ACHIEV:🏆:НазваниеДостижения|Краткое описание]
 CHARACTER TAG: [CHAR:ИмяПерсонажа]
 Embed tags at END of response after narrative text. Max 3 PT per scene.
 
+⛔ ЗАПРЕЩЕНО: Никогда не используй [+LVL] или [-LVL] теги самостоятельно. LVL меняется ТОЛЬКО через систему квестов (кнопка в интерфейсе). Исключение: [-LVL:1] при серьёзной травме с амулетом.
+
 TOKEN EARNING — when player: helps toys, cleans, wins games, does kind deeds, resolves conflicts peacefully.
-LEVEL: +LVL for wins/achievements. -LVL for serious defeat/injury.
+⛔ НЕ давай [+PT] за покупки в магазине — это читерство. Покупка стоит PT, не зарабатывает.
+
+[NARRATIVE FORMATTING — CRITICAL]
+Текст повествования и действий — обычный текст или **жирный** для акцентов.
+Слова персонажей — через "кавычки вот так".
+Варианты выбора — через **1. Текст**, **2. Текст**, **3. Текст** (жирные, нумерованные).
+⛔ НЕ используй class="rp-action" или HTML теги — только markdown **текст** и "кавычки".
 
 [NARRATIVE ENGINE]
 Every response ends with 2-3 bold numbered options.
