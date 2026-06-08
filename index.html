@@ -675,10 +675,19 @@
   <div class="api-card">
     <div class="icon">🏮</div>
     <h2>PLAYCARE</h2>
-    <p style="margin-bottom:18px;line-height:1.7">Живые игрушки ждут тебя.<br>
-    <span style="font-size:0.75rem;color:var(--text-dim)">Работает на твоём устройстве · Без API</span></p>
-    <button class="btn-primary" id="play-btn" onclick="handlePlayClick()">▶ ИГРАТЬ</button>
-    <p class="api-note" style="margin-top:12px">При первом запуске загрузится ~2 ГБ · Один раз</p>
+    <p style="margin-bottom:6px;line-height:1.75;font-size:0.88rem">
+      Глубоко под землёй горит лампа-солнце.<br>
+      Живые игрушки ждут нового жителя.
+    </p>
+    <p style="margin-bottom:20px;font-size:0.72rem;color:var(--text-dim);line-height:1.6;font-style:italic">
+      Папочка Лонг Ленг уже подписал разрешение.<br>
+      Мамочка накрывает на стол.
+    </p>
+    <button class="btn-primary" id="play-btn" onclick="handlePlayClick()">▶ ВОЙТИ В PLAYCARE</button>
+    <p class="api-note" style="margin-top:14px;line-height:1.6">
+      ИИ работает прямо на твоём устройстве — без серверов и без API‑ключей.<br>
+      <span style="color:rgba(192,132,252,0.5)">✦ &nbsp; ✦ &nbsp; ✦</span>
+    </p>
   </div>
 </div>
 
@@ -695,6 +704,54 @@
     </p>
     <button class="btn-primary" onclick="startDownload()" style="margin-bottom:10px">Скачать и играть</button>
     <button onclick="showScreen('api-screen')" style="width:100%;padding:10px;background:none;border:1px solid var(--border);border-radius:10px;color:var(--text-dim);font-family:'Cinzel',serif;font-size:0.8rem;cursor:pointer">Отмена</button>
+  </div>
+</div>
+
+<!-- ЭКРАН ВЫБОРА МОДЕЛИ -->
+<div id="model-screen" style="display:none;position:fixed;inset:0;z-index:250;background:rgba(13,10,18,0.97);backdrop-filter:blur(20px);align-items:center;justify-content:center;padding:20px">
+  <div class="api-card" style="max-width:400px;width:100%">
+    <div class="icon">🤖</div>
+    <h2 style="margin-bottom:6px">Выбери модель ИИ</h2>
+    <p style="font-size:0.78rem;color:var(--text-dim);margin-bottom:18px;line-height:1.6">
+      Рекомендуемая модель выбрана автоматически по твоему устройству.<br>
+      Можно изменить вручную.
+    </p>
+
+    <!-- Карточки моделей -->
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px" id="model-cards">
+
+      <!-- LITE -->
+      <div id="mcard-lite" onclick="selectModel('lite')" style="background:var(--bg3);border:2px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer;transition:all 0.15s">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-family:'Cinzel',serif;font-size:0.78rem;color:var(--text)">📱 Лёгкая — 1B</span>
+          <span style="font-family:'Cinzel',serif;font-size:0.65rem;color:var(--green);background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.25);border-radius:8px;padding:1px 7px">~700 МБ</span>
+        </div>
+        <div style="font-size:0.74rem;color:var(--text-dim);line-height:1.4">Для слабых телефонов (MediaTek, Mali). Быстро грузится, короткие ответы.</div>
+      </div>
+
+      <!-- MID -->
+      <div id="mcard-mid" onclick="selectModel('mid')" style="background:var(--bg3);border:2px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer;transition:all 0.15s">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-family:'Cinzel',serif;font-size:0.78rem;color:var(--text)">📱 Средняя — 3B</span>
+          <span style="font-family:'Cinzel',serif;font-size:0.65rem;color:var(--gold);background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.25);border-radius:8px;padding:1px 7px">~1.8 ГБ</span>
+        </div>
+        <div style="font-size:0.74rem;color:var(--text-dim);line-height:1.4">Для мощных телефонов и средних ПК. Хороший баланс качества и скорости.</div>
+      </div>
+
+      <!-- FULL -->
+      <div id="mcard-full" onclick="selectModel('full')" style="background:var(--bg3);border:2px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer;transition:all 0.15s">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-family:'Cinzel',serif;font-size:0.78rem;color:var(--text)">🖥️ Полная — 8B</span>
+          <span style="font-family:'Cinzel',serif;font-size:0.65rem;color:var(--accent2);background:rgba(244,114,182,0.1);border:1px solid rgba(244,114,182,0.25);border-radius:8px;padding:1px 7px">~5 ГБ</span>
+        </div>
+        <div style="font-size:0.74rem;color:var(--text-dim);line-height:1.4">Для игровых ПК с мощной видеокартой. Лучшее качество текста и длинных сцен.</div>
+      </div>
+    </div>
+
+    <div id="model-cached-hint" style="font-size:0.72rem;color:var(--green);text-align:center;margin-bottom:12px;min-height:18px"></div>
+
+    <button class="btn-primary" id="model-confirm-btn" onclick="confirmModelAndProceed()">▶ Продолжить</button>
+    <button onclick="showScreen('api-screen')" style="width:100%;margin-top:8px;padding:9px;background:none;border:1px solid var(--border);border-radius:10px;color:var(--text-dim);font-family:'Cinzel',serif;font-size:0.75rem;cursor:pointer">← Назад</button>
   </div>
 </div>
 
@@ -1269,10 +1326,65 @@ ${npcFacts}
 }
 
 // ══════════════════════════════════════════
-//  WEBLLM ENGINE
+//  WEBLLM ENGINE — МОДЕЛИ И УСТРОЙСТВА
 // ══════════════════════════════════════════
-const MODEL_ID = 'Llama-3.2-3B-Instruct-q4f16_1-MLC';
+
+// ── Каталог доступных моделей ──
+const MODELS = {
+  lite: {
+    id: 'Llama-3.2-1B-Instruct-q4f16_1-MLC',
+    label: '📱 Лёгкая (1B)',
+    size: '~700 МБ',
+    desc: 'Для слабых телефонов (MediaTek, Mali). Быстро грузится, короткие ответы.',
+    ctx: 4096,
+    target: 'mobile-low',
+  },
+  mid: {
+    id: 'Llama-3.2-3B-Instruct-q4f16_1-MLC',
+    label: '📱 Средняя (3B)',
+    size: '~1.8 ГБ',
+    desc: 'Для мощных телефонов и средних ПК. Хороший баланс качества и скорости.',
+    ctx: 8192,
+    target: 'mobile-high',
+  },
+  full: {
+    id: 'Llama-3.1-8B-Instruct-q4f16_1-MLC',
+    label: '🖥️ Полная (8B)',
+    size: '~5 ГБ',
+    desc: 'Для игровых ПК с мощной видеокартой. Лучшее качество текста.',
+    ctx: 8192,
+    target: 'desktop',
+  },
+};
+
+// ── Автоопределение рекомендуемой модели по устройству ──
+function detectRecommendedModel() {
+  const ua = navigator.userAgent;
+  const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i.test(ua);
+  if (!isMobile) return 'full';
+  // На мобильном — определяем «слабый» или «мощный» по RAM, если доступна
+  const ram = navigator.deviceMemory; // GB, может быть undefined
+  if (ram !== undefined && ram <= 3) return 'lite';
+  // iOS почти всегда без deviceMemory — ставим mid как безопасный дефолт
+  if (/iPhone|iPad/i.test(ua)) return 'mid';
+  // Android: если RAM <= 4 — lite, иначе mid
+  if (ram !== undefined && ram <= 4) return 'lite';
+  return 'mid';
+}
+
+// ── Выбранная модель (устанавливается на экране выбора) ──
+let selectedModelKey = detectRecommendedModel(); // 'lite' | 'mid' | 'full'
+// Восстанавливаем предыдущий выбор пользователя, если он есть
+(function restoreSavedModel() {
+  try {
+    const saved = localStorage.getItem('playcare_model_key_v1');
+    if (saved && MODELS[saved]) selectedModelKey = saved;
+  } catch {}
+})();
+function getSelectedModel() { return MODELS[selectedModelKey] || MODELS.mid; }
+
 const SAVE_KEY_SESSIONS = 'playcare_sessions_v1';
+const SAVE_KEY_MODEL    = 'playcare_model_key_v1';
 let engine = null;
 
 const LORE_TIPS = [
@@ -1294,35 +1406,100 @@ const LORE_TIPS = [
 ];
 
 function showScreen(id) {
-  ['api-screen','confirm-screen','loading-screen','session-screen'].forEach(s => {
+  ['api-screen','confirm-screen','model-screen','loading-screen','session-screen'].forEach(s => {
     const el = document.getElementById(s);
     if (el) el.style.display = 'none';
   });
   const target = document.getElementById(id);
   if (target) target.style.display = 'flex';
+
+  // При открытии экрана выбора модели — обновляем подсветку карточек
+  if (id === 'model-screen') refreshModelCards();
+}
+
+// Подсвечивает выбранную карточку модели и показывает подсказку о кэше
+function refreshModelCards() {
+  ['lite','mid','full'].forEach(key => {
+    const card = document.getElementById('mcard-' + key);
+    if (!card) return;
+    if (key === selectedModelKey) {
+      card.style.borderColor = 'var(--accent)';
+      card.style.background  = 'rgba(192,132,252,0.07)';
+    } else {
+      card.style.borderColor = 'var(--border)';
+      card.style.background  = 'var(--bg3)';
+    }
+  });
+  // Показываем подсказку если модель уже закэширована
+  const hint = document.getElementById('model-cached-hint');
+  if (hint) {
+    const cached = localStorage.getItem('playcare_model_cached_key');
+    if (cached === MODELS[selectedModelKey]?.id) {
+      hint.textContent = '✓ Эта модель уже загружена — запуск мгновенный';
+    } else if (cached) {
+      hint.textContent = `ℹ Загружена другая модель — потребуется скачать ${MODELS[selectedModelKey]?.size || ''}`;
+    } else {
+      hint.textContent = `Первая загрузка: ${MODELS[selectedModelKey]?.size || ''}`;
+      hint.style.color = 'var(--text-dim)';
+    }
+  }
+}
+
+// Вызывается при клике на карточку модели
+function selectModel(key) {
+  selectedModelKey = key;
+  refreshModelCards();
+}
+
+// Вызывается при нажатии «Продолжить» на экране выбора модели
+async function confirmModelAndProceed() {
+  const mdl = getSelectedModel();
+  const cached = localStorage.getItem('playcare_model_cached_key');
+  if (cached === mdl.id) {
+    // Модель уже есть — запускаем сразу без экрана загрузки
+    const sessions = getSessions();
+    await initEngine();
+    if (sessions.length === 0) startFreshGame();
+    else showSessionPicker(sessions);
+  } else {
+    // Нужно скачивать — показываем подтверждение
+    showScreen('confirm-screen');
+    // Обновляем текст в confirm-screen под выбранную модель
+    const p = document.querySelector('#confirm-screen .api-card p');
+    if (p) p.innerHTML = `
+      Для игры нужно скачать ИИ-модель прямо в браузер.<br><br>
+      <span style="color:var(--gold)">📦 Модель:</span> ${mdl.label}<br>
+      <span style="color:var(--gold)">📦 Размер:</span> ${mdl.size}<br>
+      <span style="color:var(--gold)">⏱ Время:</span> зависит от скорости интернета<br>
+      <span style="color:var(--green)">✓ Делается один раз</span> — потом офлайн
+    `;
+  }
 }
 
 function isModelCached() {
-  try { return localStorage.getItem('playcare_model_cached') === '1'; } catch { return false; }
+  // Проверяем: есть ли кэш именно для текущей выбранной модели
+  try {
+    const cachedKey = localStorage.getItem('playcare_model_cached_key');
+    return cachedKey === getSelectedModel().id;
+  } catch { return false; }
 }
 
 function getSessions() {
   try { return JSON.parse(localStorage.getItem(SAVE_KEY_SESSIONS) || '[]'); } catch { return []; }
 }
 
+// При клике «Играть» — сначала показываем выбор модели
 async function handlePlayClick() {
-  if (!isModelCached()) {
-    showScreen('confirm-screen');
-  } else {
-    const sessions = getSessions();
-    await initEngine();
-    if (sessions.length === 0) { startFreshGame(); }
-    else { showSessionPicker(sessions); }
-  }
+  showScreen('model-screen');
 }
 
+// Вызывается с экрана выбора модели после подтверждения
 async function startDownload() {
   showScreen('loading-screen');
+  // Показываем выбранную модель в заголовке загрузки
+  const mdl = getSelectedModel();
+  const h2 = document.querySelector('#loading-screen h2');
+  if (h2) h2.textContent = `ЗАГРУЗКА ${mdl.label.replace(/📱|🖥️/g,'').trim().toUpperCase()}`;
   startTipRotation();
   await initEngine(true);
 }
@@ -1345,11 +1522,49 @@ async function initEngine(isFirstLoad = false) {
   if (engine) return;
   if (!isFirstLoad) { showScreen('loading-screen'); startTipRotation(); }
 
-  const WL = window._WebLLM;
-  if (!WL) {
-    document.getElementById('loading-status').textContent = 'Ошибка: WebLLM не загружен. Нужен интернет для первой загрузки.';
+  // ── 1. Проверка WebGPU ──────────────────────────────────────────────────
+  if (!navigator.gpu) {
+    showWebGPUError('navigator.gpu недоступен — WebGPU не поддерживается этим браузером или устройством.');
     return;
   }
+  let gpuAdapter = null;
+  try {
+    gpuAdapter = await navigator.gpu.requestAdapter();
+  } catch (gpuErr) {
+    showWebGPUError('Ошибка запроса GPU-адаптера: ' + (gpuErr.message || gpuErr));
+    return;
+  }
+  if (!gpuAdapter) {
+    showWebGPUError('WebGPU недоступен: браузер не нашёл совместимый GPU-адаптер. Возможно, драйверы устарели или WebGPU отключён.');
+    return;
+  }
+
+  // ── 2. Проверка WebLLM ─────────────────────────────────────────────────
+  const WL = window._WebLLM;
+  if (!WL) {
+    setLoadingStatus('Ошибка: WebLLM не загружен. Нужен интернет для первой загрузки.');
+    return;
+  }
+
+  // ── 3. Создание движка с try/catch — без вечного зависания ─────────────
+  const mdl = getSelectedModel();
+  setLoadingStatus(`Инициализация модели ${mdl.label}…`);
+
+  // Таймаут-защита: если нет прогресса 60 секунд — считаем зависанием
+  let lastProgressTime = Date.now();
+  const HANG_TIMEOUT_MS = 60_000;
+  const hangWatcher = setInterval(() => {
+    if (Date.now() - lastProgressTime > HANG_TIMEOUT_MS) {
+      clearInterval(hangWatcher);
+      if (!engine) {
+        showWebGPUError(
+          'Загрузка зависла (нет прогресса больше 60 сек).\n' +
+          'Скорее всего, видеочип не справляется с моделью. ' +
+          'Попробуй выбрать более лёгкую модель или открой игру с ПК.'
+        );
+      }
+    }
+  }, 5000);
 
   try {
     const workerBlob = new Blob([`
@@ -1360,33 +1575,87 @@ async function initEngine(isFirstLoad = false) {
 
     engine = await WL.CreateWebWorkerMLCEngine(
       new Worker(URL.createObjectURL(workerBlob), { type: 'module' }),
-      MODEL_ID,
+      mdl.id,
       {
         initProgressCallback: (report) => {
+          lastProgressTime = Date.now(); // сбрасываем таймер зависания
           const pct = Math.round((report.progress || 0) * 100);
-          const bar = document.getElementById('progress-bar');
-          const txt = document.getElementById('progress-text');
-          const status = document.getElementById('loading-status');
+          const bar    = document.getElementById('progress-bar');
+          const txt    = document.getElementById('progress-text');
           if (bar) bar.style.width = pct + '%';
           if (txt) txt.textContent = pct + '%';
-          if (status) status.textContent = report.text || 'Загрузка...';
+          setLoadingStatus(report.text || 'Загрузка…');
         },
-        context_window_size: 8192,
+        context_window_size: mdl.ctx,
       }
     );
-    localStorage.setItem('playcare_model_cached', '1');
+
+    clearInterval(hangWatcher);
+    // Сохраняем какую модель загрузили, чтобы не перегружать при следующем запуске
+    localStorage.setItem('playcare_model_cached_key', mdl.id);
+    localStorage.setItem(SAVE_KEY_MODEL, selectedModelKey);
     if (tipInterval) clearInterval(tipInterval);
+
   } catch (e) {
+    clearInterval(hangWatcher);
     if (tipInterval) clearInterval(tipInterval);
-    const status = document.getElementById('loading-status');
-    if (status) status.textContent = 'Ошибка загрузки: ' + (e.message || e);
-    console.error(e);
+    engine = null;
+
+    const msg = e?.message || String(e);
+    // Специфичные ошибки WebGPU/OOM
+    if (/webgpu|gpu|out of memory|oom|context lost/i.test(msg)) {
+      showWebGPUError(
+        'Ваш видеочип не поддерживает WebGPU или не хватает памяти GPU.\n\n' +
+        'Попробуйте:\n' +
+        '• Выбрать более лёгкую модель (1B вместо 3B)\n' +
+        '• Открыть в Chrome на ПК\n' +
+        '• Включить флаги: chrome://flags → #enable-unsafe-webgpu'
+      );
+    } else {
+      showWebGPUError('Ошибка инициализации: ' + msg);
+    }
     return;
   }
 
+  // ── 4. Успех — запускаем игру ──────────────────────────────────────────
   const sessions = getSessions();
   if (sessions.length > 0) { showSessionPicker(sessions); }
   else { startFreshGame(); }
+}
+
+// Хелперы для экрана загрузки
+function setLoadingStatus(text) {
+  const el = document.getElementById('loading-status');
+  if (el) el.textContent = text;
+}
+
+// Показывает понятную ошибку прямо на экране загрузки (не alert)
+function showWebGPUError(msg) {
+  if (tipInterval) clearInterval(tipInterval);
+  const bar = document.getElementById('progress-bar');
+  if (bar) { bar.style.background = 'linear-gradient(90deg,#ef4444,#f87171)'; bar.style.width = '100%'; }
+  const txt = document.getElementById('progress-text');
+  if (txt) txt.textContent = '⚠';
+  setLoadingStatus('');
+
+  // Заменяем блок подсказок на карточку ошибки
+  const tipEl = document.getElementById('loading-tip');
+  if (tipEl) {
+    tipEl.style.cssText = `
+      max-width:320px; background:rgba(239,68,68,0.08);
+      border:1px solid rgba(239,68,68,0.35); border-radius:12px;
+      padding:16px 18px; font-size:0.82rem; color:#fca5a5;
+      line-height:1.65; text-align:left; white-space:pre-wrap;
+      font-style:normal; margin-top:4px;
+    `;
+    tipEl.innerHTML =
+      `<div style="font-family:'Cinzel',serif;font-size:0.9rem;color:#f87171;margin-bottom:10px">⚠ WebGPU недоступен</div>` +
+      escapeHtml(msg) +
+      `<br><br><div style="display:flex;gap:8px;flex-wrap:wrap">` +
+      `<button onclick="showScreen('model-screen')" style="background:rgba(192,132,252,0.15);border:1px solid rgba(192,132,252,0.4);border-radius:8px;padding:6px 14px;color:#c084fc;font-family:'Cinzel',serif;font-size:0.68rem;cursor:pointer">← Выбрать модель</button>` +
+      `<a href="https://caniuse.com/webgpu" target="_blank" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 14px;color:var(--text-dim);font-family:'Cinzel',serif;font-size:0.68rem;text-decoration:none;display:inline-block">Подробнее</a>` +
+      `</div>`;
+  }
 }
 
 function showSessionPicker(sessions) {
