@@ -671,10 +671,10 @@
   <div class="api-card">
     <div class="icon">🏮</div>
     <h2>PLAYCARE</h2>
-    <p>Введи свой <strong style="color:var(--accent)">Groq API ключ</strong> для входа.<br>
-    Получить бесплатно: <a href="https://console.groq.com" target="_blank">console.groq.com</a><br>
-    <span style="font-size:0.75rem;color:var(--text-dim)">Sign up → API Keys → Create API Key</span></p>
-    <input type="password" id="api-key-input" placeholder="gsk_..." autocomplete="off" />
+    <p>Введи свой <strong style="color:var(--accent)">Gemini API ключ</strong> для входа.<br>
+    Получить бесплатно: <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com</a><br>
+    <span style="font-size:0.75rem;color:var(--text-dim)">Sign in → Get API key → Create API key</span></p>
+    <input type="password" id="api-key-input" placeholder="AIza..." autocomplete="off" />
     <button class="btn-primary" onclick="startApp()">ВОЙТИ В PLAYCARE</button>
     <p class="api-note">🔒 Ключ хранится только в памяти сессии</p>
   </div>
@@ -746,6 +746,7 @@ let messages = [];   // { id, role:'user'|'assistant', content, snapshot }
 
 // History for API — rebuilt from messages on each call (last N only)
 const CTX_WINDOW = 12; // how many messages sent to API
+let memUpdateCounter = 0; // throttle memory updates
 
 let gameState = {
   char: null,
@@ -1175,9 +1176,29 @@ function rollbackTo(msgId) {
 //  CONTEXT COMPRESSION — build API history
 // ══════════════════════════════════════════
 function buildApiHistory() {
-  // Take last CTX_WINDOW messages from our full list
   const recent = messages.slice(-CTX_WINDOW);
-  return recent.map(m => ({ role: m.role, content: m.content }));
+  // Gemini requires: role must be 'user' or 'model', must alternate, must start with 'user'
+  const converted = recent.map(m => ({
+    role: m.role === 'assistant' ? 'model' : 'user',
+    content: m.content
+  }));
+
+  // Fix alternation: merge consecutive same-role messages, ensure starts with user
+  const fixed = [];
+  for (const msg of converted) {
+    if (fixed.length && fixed[fixed.length - 1].role === msg.role) {
+      // Merge with previous
+      fixed[fixed.length - 1].content += '\n' + msg.content;
+    } else {
+      fixed.push({ ...msg });
+    }
+  }
+
+  // Must start with 'user'
+  while (fixed.length && fixed[0].role !== 'user') fixed.shift();
+
+  // Must end with 'user' (the current message is last)
+  return fixed;
 }
 
 function buildMemoryBlock() {
@@ -1229,18 +1250,19 @@ ${JSON.stringify(gameState.memory.npcFacts)}
 Правила: только НОВЫЕ факты, которых нет в известных. Пустые массивы если ничего нового. Максимум 3 loreFacts и 2 npcFacts за ответ.`;
 
   try {
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        messages: [{ role: 'user', content: analysisPrompt }],
-        temperature: 0.1,
-        max_tokens: 400,
-      })
-    });
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: analysisPrompt }] }],
+          generationConfig: { temperature: 0.1, maxOutputTokens: 400 },
+        })
+      }
+    );
     const data = await res.json();
-    const raw = data.choices?.[0]?.message?.content || '{}';
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
     // Strip markdown fences if present
     const cleaned = raw.replace(/```json|```/g, '').trim();
     const parsed = JSON.parse(cleaned);
@@ -1312,38 +1334,44 @@ async function sendToGroq(userText) {
   const systemWithMem = SYSTEM_PROMPT + '\n\n' + memBlock;
 
   const body = {
-    model: 'llama-3.3-70b-versatile',
-    messages: [
-      { role: 'system', content: systemWithMem },
-      ...apiHistory
-    ],
-    temperature: 0.9,
-    max_tokens: 1200,
+    contents: apiHistory.map(m => ({
+      role: m.role, // already 'user' or 'model' from buildApiHistory
+      parts: [{ text: m.content }]
+    })),
+    systemInstruction: { parts: [{ text: systemWithMem }] },
+    generationConfig: {
+      temperature: 1.5,
+      topP: 0.95,
+      topK: 64,
+      maxOutputTokens: 1200,
+    },
   };
 
   try {
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-      body: JSON.stringify(body)
-    });
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      }
+    );
     const data = await res.json();
 
     if (data.error) {
       document.getElementById('typing-msg')?.remove();
       addErrorMsg(`Ошибка API: ${data.error.message}`);
-      messages.pop(); // remove user msg
+      messages.pop();
     } else {
-      const reply = data.choices?.[0]?.message?.content || '...';
-      const snapAfter = snapshotState(); // snapshot AFTER tags parsed inside addMsgToChat
+      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || '...';
+      const snapAfter = snapshotState();
       const botMsg = { id: nextMsgId(), role: 'assistant', content: reply, snapshot: snapAfter };
       messages.push(botMsg);
       addMsgToChat(botMsg);
-      // Update snapshot with post-tag state
       botMsg.snapshot = snapshotState();
 
-      // Async memory update (non-blocking)
-      autoUpdateMemory(reply);
+      memUpdateCounter++;
+      if (memUpdateCounter % 3 === 0) autoUpdateMemory(reply);
       detectCharFromHistory();
     }
   } catch (e) {
