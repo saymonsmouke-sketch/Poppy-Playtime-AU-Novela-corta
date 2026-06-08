@@ -626,7 +626,21 @@
   }
   .quest-do-btn:hover { opacity: 0.85; }
 
-  .quest-empty { text-align: center; color: var(--text-dim); font-style: italic; font-size: 0.82rem; padding: 20px 0; }
+  .quest-active-notice {
+    background: rgba(192,132,252,0.08); border: 1px solid rgba(192,132,252,0.3);
+    border-radius: 10px; padding: 8px 14px; text-align: center;
+    font-size: 0.78rem; color: var(--accent); margin-bottom: 10px; font-style: italic;
+  }
+  .quest-active-card { border-color: rgba(192,132,252,0.5) !important; background: rgba(192,132,252,0.05); }
+  .quest-in-progress {
+    text-align: center; color: var(--accent); font-family: 'Cinzel', serif;
+    font-size: 0.72rem; padding: 8px; border: 1px dashed rgba(192,132,252,0.4);
+    border-radius: 8px; animation: pulse-text 2s ease-in-out infinite;
+  }
+  @keyframes pulse-text { 0%,100%{opacity:0.7} 50%{opacity:1} }
+  .quest-done-label {
+    text-align: center; color: var(--green); font-family: 'Cinzel', serif; font-size: 0.75rem;
+  }
 
   textarea::-webkit-scrollbar-thumb { background: var(--border); }
 
@@ -744,8 +758,8 @@ let gameState = {
     lore: [],
     npcFacts: {},
   },
-  quests: [],          // active quests [ { ...questDef, completed: false } ]
-  questRefreshCost: 0, // first refresh is free
+  quests: [],
+  activeQuestId: null,
 };
 
 // snapshot = deep clone of gameState saved at each message
@@ -796,7 +810,7 @@ function pickRandomQuests(count = 5) {
   result.push(pick(byDiff.medium), pick(byDiff.medium));
   result.push(pick(byDiff.hard));
   // shuffle
-  return result.sort(()=>Math.random()-0.5).map(q => ({ ...q, completed: false }));
+  return result.sort(()=>Math.random()-0.5).map(q => ({ ...q, status: 'idle' }));
 }
 
 function initQuests() {
@@ -807,26 +821,41 @@ function initQuests() {
 
 function refreshQuests() {
   const REFRESH_COST = 2;
-  if (gameState.tokens < REFRESH_COST) { toast(`❌ Нужно ${REFRESH_COST} PT для обновления квестов`); return; }
+  if (gameState.quests.some(q => q.status === 'active')) { toast('❌ Сначала заверши активный квест!'); return; }
+  if (gameState.tokens < REFRESH_COST) { toast(`❌ Нужно ${REFRESH_COST} PT для обновления`); return; }
   addTokens(-REFRESH_COST);
   gameState.quests = pickRandomQuests();
   toast('📋 Список квестов обновлён!');
   openPanel('quests');
 }
 
-function completeQuest(questId) {
+function startQuest(questId) {
   const q = gameState.quests.find(q => q.id === questId);
-  if (!q || q.completed) return;
-  q.completed = true;
+  if (!q || q.status !== 'idle') return;
+  q.status = 'active';
+  gameState.activeQuestId = questId;
   closePanel();
-  // Give rewards
-  if (q.pt > 0) { addTokens(q.pt); }
-  if (q.lvl > 0) { addLevel(q.lvl); }
+  addSystemMsg(`📋 Квест начат: «${q.title}»`);
+  sendToGroq(`[СИСТЕМНОЕ УВЕДОМЛЕНИЕ — КВЕСТ НАЧАТ]
+Игрок принял квест: "${q.title}"
+Задача: ${q.desc}
+Подсказка: ${q.hint}
+ID квеста: ${q.id}
+
+Веди сцену так, чтобы игрок мог выполнить это задание естественным образом в рамках нарратива. Когда ты (как рассказчик) убедишься что задание РЕАЛЬНО выполнено по ходу RP — добавь в конце ответа тег [QUEST_DONE:${q.id}]. НЕ ставь этот тег пока задание не выполнено. НЕ говори игроку про тег.`);
+}
+
+function completeQuest(questId) {
+  // Called ONLY by parseAITags when bot emits [QUEST_DONE:id]
+  const q = gameState.quests.find(q => q.id === questId);
+  if (!q || q.status === 'completed') return;
+  q.status = 'completed';
+  if (gameState.activeQuestId === questId) gameState.activeQuestId = null;
+  if (q.pt > 0) addTokens(q.pt);
+  if (q.lvl > 0) addLevel(q.lvl);
   const rewardText = [q.pt > 0 ? `+${q.pt} PT` : '', q.lvl > 0 ? `+${q.lvl} LVL` : ''].filter(Boolean).join(', ');
-  addSystemMsg(`📋 Квест выполнен: «${q.title}»! Награда: ${rewardText}`);
-  toast(`✅ Квест «${q.title}» выполнен! ${rewardText}`, 3500);
-  // Tell narrator
-  sendToGroq(`[Игрок сообщает о выполнении квеста "${q.title}": ${q.desc} — подтверди выполнение кратко в нарративе, не давай тегов [+PT] или [+LVL] — награда уже выдана системой]`);
+  addSystemMsg(`✅ Квест выполнен: «${q.title}»! Награда: ${rewardText}`);
+  toast(`✅ «${q.title}» — ${rewardText}`, 3500);
 }
 
 // ══════════════════════════════════════════
@@ -892,6 +921,11 @@ function parseAITags(text) {
       gameState.achievements.push({ icon, name, desc });
       toast(`🏆 Достижение: ${name}!`, 3000);
     }
+    return '';
+  });
+  // Quest completion tag — only bot can trigger this
+  text = text.replace(/\[QUEST_DONE:([^\]]+)\]/g, (_, id) => {
+    completeQuest(id.trim());
     return '';
   });
   return text.trim();
@@ -1481,27 +1515,37 @@ function renderQuests(el) {
   initQuests();
   const REFRESH_COST = 2;
   const canRefresh = gameState.tokens >= REFRESH_COST;
+  const hasActive = gameState.quests.some(q => q.status === 'active');
   const diffLabel = { easy:'🟢 Лёгкий', medium:'🟡 Средний', hard:'🔴 Сложный' };
 
   el.innerHTML = `
     <div class="panel-header"><h3>📋 Квесты</h3><button class="panel-close" onclick="closePanel()">✕</button></div>
-    <button class="quest-refresh-btn" onclick="refreshQuests()" ${!canRefresh?'disabled':''}>
-      🔄 Обновить список квестов (${REFRESH_COST} PT) ${!canRefresh?'— не хватает токенов':''}
+    ${hasActive ? '<div class="quest-active-notice">⚔️ Квест в процессе — выполни его в чате!</div>' : ''}
+    <button class="quest-refresh-btn" onclick="refreshQuests()" ${!canRefresh||hasActive?'disabled':''}>
+      🔄 Обновить список (${REFRESH_COST} PT)${!canRefresh?' — мало токенов':hasActive?' — сначала заверши текущий квест':''}
     </button>
     <div id="quest-list-inner"></div>`;
 
   const list = el.querySelector('#quest-list-inner');
-  const active = gameState.quests.filter(q => !q.completed);
-  const done = gameState.quests.filter(q => q.completed);
-
   if (!gameState.quests.length) {
     list.innerHTML = '<div class="quest-empty">Квестов нет. Нажми «Обновить»!</div>';
     return;
   }
 
-  [...active, ...done].forEach(q => {
+  gameState.quests.forEach(q => {
     const d = document.createElement('div');
-    d.className = `quest-card ${q.diff}${q.completed?' completed':''}`;
+    d.className = `quest-card ${q.diff}${q.status==='completed'?' completed':''}${q.status==='active'?' quest-active-card':''}`;
+
+    let actionBtn = '';
+    if (q.status === 'idle') {
+      const blocked = hasActive ? 'disabled title="Сначала заверши активный квест"' : '';
+      actionBtn = `<button class="quest-do-btn" onclick="startQuest('${q.id}')" ${blocked}>▶ Начать квест</button>`;
+    } else if (q.status === 'active') {
+      actionBtn = `<div class="quest-in-progress">⏳ Выполняется — действуй в чате!</div>`;
+    } else {
+      actionBtn = `<div class="quest-done-label">✓ Выполнено</div>`;
+    }
+
     d.innerHTML = `
       <div class="quest-badge ${q.diff}">${diffLabel[q.diff]}</div>
       <div class="quest-title">${q.icon} ${q.title}</div>
@@ -1511,10 +1555,7 @@ function renderQuests(el) {
         ${q.pt>0?`<div class="quest-reward-tag pt">🪙 +${q.pt} PT</div>`:''}
         ${q.lvl>0?`<div class="quest-reward-tag lvl">⚔️ +${q.lvl} LVL</div>`:''}
       </div>
-      ${q.completed
-        ? '<div style="text-align:center;color:var(--green);font-family:\'Cinzel\',serif;font-size:0.75rem">✓ Выполнено</div>'
-        : `<button class="quest-do-btn" onclick="completeQuest('${q.id}')">✓ Отметить как выполненный</button>`
-      }`;
+      ${actionBtn}`;
     list.appendChild(d);
   });
 }
