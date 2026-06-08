@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>PLAYCARE — Живые Игрушки</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<script type="module">
+  import { CreateWebWorkerMLCEngine } from "https://esm.run/@mlc-ai/web-llm";
+  window._WebLLM = { CreateWebWorkerMLCEngine };
+</script>
 <style>
   :root {
     --bg: #0d0a12;
@@ -666,28 +670,53 @@
 
 <div id="toast"></div>
 
-<!-- API KEY SCREEN -->
+<!-- ГЛАВНЫЙ ЭКРАН — КНОПКА ИГРАТЬ -->
 <div id="api-screen">
   <div class="api-card">
     <div class="icon">🏮</div>
     <h2>PLAYCARE</h2>
-    <p>Введи свой <strong style="color:var(--accent)">Gemini API ключ</strong> для входа.<br>
-    Получить бесплатно: <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com</a><br>
-    <span style="font-size:0.75rem;color:var(--text-dim)">Sign in → Get API key → Create API key</span></p>
-    <input type="password" id="api-key-input" placeholder="AIza..." autocomplete="off" />
-    <select id="model-select" style="
-      width:100%; padding:10px 14px; margin-bottom:8px;
-      background:#1a1025; border:1px solid rgba(192,132,252,0.3);
-      border-radius:10px; color:#e2d9f3; font-family:'Cinzel',serif;
-      font-size:0.78rem; cursor:pointer; outline:none;
-    ">
-      <option value="gemini-2.0-flash">⚡ Gemini 2.0 Flash — стабильный</option>
-      <option value="gemini-2.5-flash" selected>🌟 Gemini 2.5 Flash — умнее (может быть занят)</option>
-      <option value="gemini-2.5-pro">🔥 Gemini 2.5 Pro — самый мощный (медленнее)</option>
-      <option value="gemini-3.5-flash">✨ Gemini 3.5 Flash — новейший</option>
-    </select>
-    <button class="btn-primary" onclick="startApp()">ВОЙТИ В PLAYCARE</button>
-    <p class="api-note">🔒 Ключ хранится только в памяти сессии</p>
+    <p style="margin-bottom:18px;line-height:1.7">Живые игрушки ждут тебя.<br>
+    <span style="font-size:0.75rem;color:var(--text-dim)">Работает на твоём устройстве · Без API</span></p>
+    <button class="btn-primary" id="play-btn" onclick="handlePlayClick()">▶ ИГРАТЬ</button>
+    <p class="api-note" style="margin-top:12px">При первом запуске загрузится ~2 ГБ · Один раз</p>
+  </div>
+</div>
+
+<!-- ЭКРАН ПОДТВЕРЖДЕНИЯ ЗАГРУЗКИ -->
+<div id="confirm-screen" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(13,10,18,0.97);backdrop-filter:blur(20px);align-items:center;justify-content:center;padding:20px">
+  <div class="api-card">
+    <div class="icon">📦</div>
+    <h2 style="margin-bottom:12px">Загрузка модели</h2>
+    <p style="margin-bottom:20px;line-height:1.8;text-align:left">
+      Для игры нужно скачать ИИ-модель прямо в браузер.<br><br>
+      <span style="color:var(--gold)">📦 Размер:</span> ~2 ГБ<br>
+      <span style="color:var(--gold)">⏱ Время:</span> зависит от скорости интернета<br>
+      <span style="color:var(--green)">✓ Делается один раз</span> — потом офлайн
+    </p>
+    <button class="btn-primary" onclick="startDownload()" style="margin-bottom:10px">Скачать и играть</button>
+    <button onclick="showScreen('api-screen')" style="width:100%;padding:10px;background:none;border:1px solid var(--border);border-radius:10px;color:var(--text-dim);font-family:'Cinzel',serif;font-size:0.8rem;cursor:pointer">Отмена</button>
+  </div>
+</div>
+
+<!-- ЭКРАН ЗАГРУЗКИ С ПРОГРЕСС-БАРОМ -->
+<div id="loading-screen" style="display:none;position:fixed;inset:0;z-index:300;background:var(--bg);flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center">
+  <div class="lamp" style="width:36px;height:36px;margin-bottom:20px"></div>
+  <h2 style="font-family:'Cinzel',serif;color:var(--accent);font-size:1rem;letter-spacing:0.2em;margin-bottom:8px">ЗАГРУЗКА PLAYCARE</h2>
+  <p id="loading-status" style="font-size:0.8rem;color:var(--text-dim);margin-bottom:20px;min-height:20px">Инициализация...</p>
+  <div style="width:100%;max-width:320px;background:var(--bg3);border-radius:10px;height:8px;overflow:hidden;margin-bottom:8px;border:1px solid var(--border)">
+    <div id="progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#7c3aed,#c084fc);border-radius:10px;transition:width 0.4s ease"></div>
+  </div>
+  <p id="progress-text" style="font-family:'Cinzel',serif;font-size:0.75rem;color:var(--accent);margin-bottom:30px">0%</p>
+  <div id="loading-tip" style="max-width:300px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;font-size:0.8rem;color:var(--text-dim);line-height:1.6;font-style:italic"></div>
+</div>
+
+<!-- ЭКРАН ВЫБОРА СЕССИИ -->
+<div id="session-screen" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(13,10,18,0.97);backdrop-filter:blur(20px);align-items:center;justify-content:center;padding:20px">
+  <div class="api-card" style="max-width:400px;width:100%">
+    <div class="icon">💾</div>
+    <h2 style="margin-bottom:16px">Продолжить игру?</h2>
+    <div id="session-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;max-height:260px;overflow-y:auto"></div>
+    <button class="btn-primary" onclick="startFreshGame()">✨ Новая игра</button>
   </div>
 </div>
 
@@ -758,7 +787,7 @@ let messages = [];   // { id, role:'user'|'assistant', content, snapshot }
 // History for API — rebuilt from messages on each call (last N only)
 const CTX_WINDOW = 12;
 let memUpdateCounter = 0;
-let selectedModel = 'gemini-2.5-flash';
+let selectedModel = 'claude-haiku-4-5-20251001';
 
 let gameState = {
   char: null,
@@ -1159,16 +1188,19 @@ function rollbackTo(msgId) {
   // Remove DOM elements for removed messages
   removed.forEach(m => {
     const el = document.querySelector(`[data-msg-id="${m.id}"]`);
-    if (el) el.remove();
+    if (el && el.parentNode) el.parentNode.removeChild(el);
   });
   // Also remove any system/memory flash messages after the rollback point
-  // (they have no data-msg-id, so we remove all system/flash after last kept msg's DOM position)
   const keptEl = kept.length ? document.querySelector(`[data-msg-id="${kept[kept.length-1].id}"]`) : null;
   if (keptEl) {
     const chat = document.getElementById('chat');
-    const children = Array.from(chat.children);
-    const keptPos = children.indexOf(keptEl);
-    children.slice(keptPos + 1).forEach(el => el.remove());
+    const toRemove = [];
+    let found = false;
+    for (const child of chat.children) {
+      if (found) toRemove.push(child);
+      if (child === keptEl) found = true;
+    }
+    toRemove.forEach(el => { if (el.parentNode === chat) chat.removeChild(el); });
   }
 
   messages = kept;
@@ -1189,9 +1221,9 @@ function rollbackTo(msgId) {
 // ══════════════════════════════════════════
 function buildApiHistory() {
   const recent = messages.slice(-CTX_WINDOW);
-  // Gemini requires: role must be 'user' or 'model', must alternate, must start with 'user'
+  // Claude requires: role must be 'user' or 'assistant', must alternate, start with 'user'
   const converted = recent.map(m => ({
-    role: m.role === 'assistant' ? 'model' : 'user',
+    role: m.role === 'assistant' ? 'assistant' : 'user',
     content: m.content
   }));
 
@@ -1199,7 +1231,6 @@ function buildApiHistory() {
   const fixed = [];
   for (const msg of converted) {
     if (fixed.length && fixed[fixed.length - 1].role === msg.role) {
-      // Merge with previous
       fixed[fixed.length - 1].content += '\n' + msg.content;
     } else {
       fixed.push({ ...msg });
@@ -1209,7 +1240,6 @@ function buildApiHistory() {
   // Must start with 'user'
   while (fixed.length && fixed[0].role !== 'user') fixed.shift();
 
-  // Must end with 'user' (the current message is last)
   return fixed;
 }
 
@@ -1239,10 +1269,262 @@ ${npcFacts}
 }
 
 // ══════════════════════════════════════════
-//  AUTO MEMORY UPDATE (after each bot reply)
+//  WEBLLM ENGINE
 // ══════════════════════════════════════════
+const MODEL_ID = 'Llama-3.2-3B-Instruct-q4f16_1-MLC';
+const SAVE_KEY_SESSIONS = 'playcare_sessions_v1';
+let engine = null;
+
+const LORE_TIPS = [
+  '🏮 Playcare скрыт глубоко под землёй — огромный купол в гигантской пещере.',
+  '☀️ Лампа-солнце на вершине купола — она встаёт утром и гаснет ночью.',
+  '🐉 Саймон втайне пишет стихи, хотя никогда в этом не признается.',
+  '🐱 Нап — единственный, кто умеет выпускать красный маковый газ.',
+  '🐶 Дэй верит что когда-нибудь Улыбающиеся и Кошмарные помирятся.',
+  '🚪 Выходная Дверь закрыта на тысячу замков и приварена намертво.',
+  '🤡 Робо-Клоуны охраняют Выходную Дверь и никогда не говорят.',
+  '🦁 Ярнаби знает тайны Playcare, но делится ими очень редко.',
+  '🐷 Пикки втайне обожает бутерброды с арахисовым маслом.',
+  '💙 Хагги Вагги — добрый великан, который боится темноты.',
+  '🏢 Папочка Лонг Ленг принимает только по приглашению.',
+  '🐰 Хоппи читает любовные романы украдкой под одеялом.',
+  '🦇 Раби знает все сплетни Playcare раньше всех остальных.',
+  '🐸 Икки мечтает стать крутым, но всегда попадает в нелепые ситуации.',
+  '🌳 Под статуей Папочки в парке скрыт подвал с генератором.',
+];
+
+function showScreen(id) {
+  ['api-screen','confirm-screen','loading-screen','session-screen'].forEach(s => {
+    const el = document.getElementById(s);
+    if (el) el.style.display = 'none';
+  });
+  const target = document.getElementById(id);
+  if (target) target.style.display = 'flex';
+}
+
+function isModelCached() {
+  try { return localStorage.getItem('playcare_model_cached') === '1'; } catch { return false; }
+}
+
+function getSessions() {
+  try { return JSON.parse(localStorage.getItem(SAVE_KEY_SESSIONS) || '[]'); } catch { return []; }
+}
+
+async function handlePlayClick() {
+  if (!isModelCached()) {
+    showScreen('confirm-screen');
+  } else {
+    const sessions = getSessions();
+    await initEngine();
+    if (sessions.length === 0) { startFreshGame(); }
+    else { showSessionPicker(sessions); }
+  }
+}
+
+async function startDownload() {
+  showScreen('loading-screen');
+  startTipRotation();
+  await initEngine(true);
+}
+
+let tipInterval = null;
+function startTipRotation() {
+  const el = document.getElementById('loading-tip');
+  let i = Math.floor(Math.random() * LORE_TIPS.length);
+  if (el) el.textContent = LORE_TIPS[i];
+  tipInterval = setInterval(() => {
+    i = (i + 1) % LORE_TIPS.length;
+    if (el) {
+      el.style.opacity = '0';
+      setTimeout(() => { el.textContent = LORE_TIPS[i]; el.style.opacity = '1'; }, 400);
+    }
+  }, 5000);
+}
+
+async function initEngine(isFirstLoad = false) {
+  if (engine) return;
+  if (!isFirstLoad) { showScreen('loading-screen'); startTipRotation(); }
+
+  const WL = window._WebLLM;
+  if (!WL) {
+    document.getElementById('loading-status').textContent = 'Ошибка: WebLLM не загружен. Нужен интернет для первой загрузки.';
+    return;
+  }
+
+  try {
+    const workerBlob = new Blob([`
+      import { WebWorkerMLCEngineHandler } from "https://esm.run/@mlc-ai/web-llm";
+      const h = new WebWorkerMLCEngineHandler();
+      self.onmessage = (msg) => h.onmessage(msg);
+    `], { type: 'module' });
+
+    engine = await WL.CreateWebWorkerMLCEngine(
+      new Worker(URL.createObjectURL(workerBlob), { type: 'module' }),
+      MODEL_ID,
+      {
+        initProgressCallback: (report) => {
+          const pct = Math.round((report.progress || 0) * 100);
+          const bar = document.getElementById('progress-bar');
+          const txt = document.getElementById('progress-text');
+          const status = document.getElementById('loading-status');
+          if (bar) bar.style.width = pct + '%';
+          if (txt) txt.textContent = pct + '%';
+          if (status) status.textContent = report.text || 'Загрузка...';
+        },
+        context_window_size: 8192,
+      }
+    );
+    localStorage.setItem('playcare_model_cached', '1');
+    if (tipInterval) clearInterval(tipInterval);
+  } catch (e) {
+    if (tipInterval) clearInterval(tipInterval);
+    const status = document.getElementById('loading-status');
+    if (status) status.textContent = 'Ошибка загрузки: ' + (e.message || e);
+    console.error(e);
+    return;
+  }
+
+  const sessions = getSessions();
+  if (sessions.length > 0) { showSessionPicker(sessions); }
+  else { startFreshGame(); }
+}
+
+function showSessionPicker(sessions) {
+  showScreen('session-screen');
+  const list = document.getElementById('session-list');
+  list.innerHTML = '';
+  sessions.forEach((s, idx) => {
+    const d = document.createElement('div');
+    d.className = 'save-slot';
+    d.innerHTML = `
+      <div class="s-info">
+        <div class="s-name">${s.char || 'Без персонажа'} · LVL ${s.level} · 🪙${s.tokens}</div>
+        <div class="s-meta">${s.date} · ${s.msgs} сообщений</div>
+      </div>
+      <div class="save-slot-btns">
+        <button class="s-btn load" onclick="loadSession(${idx})">Играть</button>
+        <button class="s-btn del" onclick="deleteSession(${idx})">✕</button>
+      </div>`;
+    list.appendChild(d);
+  });
+}
+
+function loadSession(idx) {
+  const sessions = getSessions();
+  const s = sessions[idx];
+  if (!s) return;
+  gameState.char = s.char; gameState.level = s.level; gameState.tokens = s.tokens;
+  gameState.inventory = s.inventory || []; gameState.relations = s.relations || {};
+  gameState.achievements = s.achievements || [];
+  gameState.memory = s.memory || { lore: [], npcFacts: {} };
+  gameState.quests = s.quests || [];
+  messages = s.messages || [];
+  const chat = document.getElementById('chat');
+  chat.innerHTML = '';
+  messages.forEach(m => chat.appendChild(buildMsgDom(m)));
+  chat.scrollTop = 1e9;
+  updateStatusBar();
+  launchApp();
+}
+
+function deleteSession(idx) {
+  const sessions = getSessions();
+  sessions.splice(idx, 1);
+  localStorage.setItem(SAVE_KEY_SESSIONS, JSON.stringify(sessions));
+  showSessionPicker(sessions);
+}
+
+function startFreshGame() {
+  launchApp();
+  startSession();
+}
+
+function launchApp() {
+  ['api-screen','confirm-screen','loading-screen','session-screen'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  document.getElementById('app').classList.add('visible');
+  initQuests();
+  updateStatusBar();
+}
+
+function saveGame() {
+  const sessions = getSessions();
+  const now = new Date();
+  sessions.unshift({
+    char: gameState.char, level: gameState.level, tokens: gameState.tokens,
+    inventory: gameState.inventory, relations: gameState.relations,
+    achievements: gameState.achievements, memory: gameState.memory,
+    quests: gameState.quests, messages: messages,
+    date: now.toLocaleDateString('ru') + ' ' + now.toLocaleTimeString('ru', {hour:'2-digit',minute:'2-digit'}),
+    msgs: messages.length,
+  });
+  if (sessions.length > 5) sessions.splice(5);
+  localStorage.setItem(SAVE_KEY_SESSIONS, JSON.stringify(sessions));
+  closePanel();
+  toast('💾 Сессия сохранена!');
+}
+
+// ══════════════════════════════════════════
+//  INFERENCE — LOCAL WEBLLM
+// ══════════════════════════════════════════
+async function generateLocal(msgs) {
+  const systemMsg = msgs[0];
+  let history = msgs.slice(1);
+  if (history.length > 12) history = history.slice(history.length - 12);
+  const reply = await engine.chat.completions.create({
+    messages: [systemMsg, ...history],
+    temperature: 0.85,
+    max_tokens: 1200,
+  });
+  return reply.choices[0].message.content;
+}
+
+async function sendToGroq(userText) {
+  if (isLoading || !engine) {
+    if (!engine) addErrorMsg('Модель не загружена. Нажми ИГРАТЬ на главном экране.');
+    return;
+  }
+  isLoading = true;
+  document.getElementById('send-btn').disabled = true;
+  showTyping();
+
+  const snap = snapshotState();
+  const userMsg = { id: nextMsgId(), role: 'user', content: userText, snapshot: snap };
+  messages.push(userMsg);
+  const allUserEls = document.querySelectorAll('.msg-user');
+  if (allUserEls.length) allUserEls[allUserEls.length - 1].dataset.msgId = userMsg.id;
+
+  const memBlock = buildMemoryBlock();
+  const systemWithMem = SYSTEM_PROMPT + '\n\n' + memBlock;
+  const apiHistory = buildApiHistory();
+
+  try {
+    const reply = await generateLocal([
+      { role: 'system', content: systemWithMem },
+      ...apiHistory.map(m => ({ role: m.role, content: m.content }))
+    ]);
+    const snapAfter = snapshotState();
+    const botMsg = { id: nextMsgId(), role: 'assistant', content: reply, snapshot: snapAfter };
+    messages.push(botMsg);
+    addMsgToChat(botMsg);
+    botMsg.snapshot = snapshotState();
+    memUpdateCounter++;
+    if (memUpdateCounter % 3 === 0) autoUpdateMemory(reply);
+    detectCharFromHistory();
+  } catch (e) {
+    document.getElementById('typing-msg')?.remove();
+    addErrorMsg('Ошибка генерации: ' + (e.message || e));
+    messages.pop();
+  }
+
+  isLoading = false;
+  document.getElementById('send-btn').disabled = false;
+}
+
 async function autoUpdateMemory(botReply) {
-  // Call Groq with a minimal analysis prompt to extract key events
+  if (!engine) return;
   const analysisPrompt = `Ты — система анализа нарратива. Прочитай последний ответ рассказчика и выдай ТОЛЬКО JSON без пояснений.
 
 Ответ рассказчика:
@@ -1254,146 +1536,34 @@ ${botReply.slice(0, 1200)}
 ${JSON.stringify(gameState.memory.npcFacts)}
 
 Верни JSON строго в этом формате:
-{
-  "loreFacts": [{"tag":"СОБЫТИЕ|МЕСТО|ТАЙНА|ОТНОШЕНИЯ|СТАТУС","text":"краткий факт"}],
-  "npcFacts": {"ИмяNPC": ["новый факт о нём"]},
-  "newRelations": {"ИмяNPC": {"loveDelta":0,"friendDelta":0}}
-}
-Правила: только НОВЫЕ факты, которых нет в известных. Пустые массивы если ничего нового. Максимум 3 loreFacts и 2 npcFacts за ответ.`;
+{"loreFacts":[{"tag":"СОБЫТИЕ","text":"краткий факт"}],"npcFacts":{"ИмяNPC":["факт"]},"newRelations":{"ИмяNPC":{"loveDelta":0,"friendDelta":0}}}
+Правила: только НОВЫЕ факты. Пустые массивы если ничего нового. Максимум 3 loreFacts и 2 npcFacts.`;
 
   try {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ role: 'user', parts: [{ text: analysisPrompt }] }],
-          generationConfig: { temperature: 0.1, maxOutputTokens: 400 },
-        })
-      }
-    );
-    const data = await res.json();
-    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-    // Strip markdown fences if present
-    const cleaned = raw.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(cleaned);
-
+    const reply = await engine.chat.completions.create({
+      messages: [
+        { role: 'system', content: 'Отвечай ТОЛЬКО JSON без пояснений и без markdown.' },
+        { role: 'user', content: analysisPrompt }
+      ],
+      temperature: 0.1, max_tokens: 400,
+    });
+    const raw = reply.choices[0].message.content || '{}';
+    const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
     let updated = false;
-
-    // Lore facts
-    if (parsed.loreFacts?.length) {
-      parsed.loreFacts.forEach(f => {
-        if (f.text && f.tag && gameState.memory.lore.length < 40) {
-          gameState.memory.lore.push({ tag: f.tag, text: f.text });
-          updated = true;
-        }
-      });
-    }
-
-    // NPC facts
-    if (parsed.npcFacts) {
-      Object.entries(parsed.npcFacts).forEach(([name, facts]) => {
-        if (!gameState.memory.npcFacts[name]) gameState.memory.npcFacts[name] = [];
-        facts.forEach(f => {
-          if (f && !gameState.memory.npcFacts[name].includes(f) && gameState.memory.npcFacts[name].length < 15) {
-            gameState.memory.npcFacts[name].push(f);
-            updated = true;
-          }
-        });
-      });
-    }
-
-    // Relation deltas
-    if (parsed.newRelations) {
-      Object.entries(parsed.newRelations).forEach(([name, d]) => {
-        if (!gameState.relations[name]) gameState.relations[name] = { love: 0, friend: 0 };
-        if (d.loveDelta) gameState.relations[name].love = Math.max(0, Math.min(100, gameState.relations[name].love + d.loveDelta));
-        if (d.friendDelta) gameState.relations[name].friend = Math.max(0, Math.min(100, gameState.relations[name].friend + d.friendDelta));
-        if (d.loveDelta || d.friendDelta) updated = true;
-      });
-    }
-
-    if (updated) {
-      addMemoryFlash('Хроника обновлена');
-    }
-  } catch (e) {
-    // Silent fail — memory update is non-critical
-  }
-}
-
-// ══════════════════════════════════════════
-//  API CALL
-// ══════════════════════════════════════════
-async function sendToGroq(userText) {
-  if (isLoading) return;
-  isLoading = true;
-  document.getElementById('send-btn').disabled = true;
-  showTyping();
-
-  // Build user message object WITH snapshot BEFORE we mutate state
-  const snap = snapshotState();
-  const userMsg = { id: nextMsgId(), role: 'user', content: userText, snapshot: snap };
-  messages.push(userMsg);
-  // DOM was already added before this call in sendMessage()
-  // Tag the last user DOM element with this id
-  const allUserEls = document.querySelectorAll('.msg-user');
-  if (allUserEls.length) allUserEls[allUserEls.length - 1].dataset.msgId = userMsg.id;
-
-  const memBlock = buildMemoryBlock();
-  const apiHistory = buildApiHistory();
-
-  const systemWithMem = SYSTEM_PROMPT + '\n\n' + memBlock;
-
-  const body = {
-    contents: apiHistory.map(m => ({
-      role: m.role, // already 'user' or 'model' from buildApiHistory
-      parts: [{ text: m.content }]
-    })),
-    systemInstruction: { parts: [{ text: systemWithMem }] },
-    generationConfig: {
-      temperature: 1.5,
-      topP: 0.95,
-      topK: 64,
-      maxOutputTokens: 1200,
-    },
-  };
-
-  try {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      }
-    );
-    const data = await res.json();
-
-    if (data.error) {
-      document.getElementById('typing-msg')?.remove();
-      addErrorMsg(`Ошибка API: ${data.error.message}`);
-      messages.pop();
-    } else {
-      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || '...';
-      const snapAfter = snapshotState();
-      const botMsg = { id: nextMsgId(), role: 'assistant', content: reply, snapshot: snapAfter };
-      messages.push(botMsg);
-      addMsgToChat(botMsg);
-      botMsg.snapshot = snapshotState();
-
-      memUpdateCounter++;
-      if (memUpdateCounter % 3 === 0) autoUpdateMemory(reply);
-      detectCharFromHistory();
-    }
-  } catch (e) {
-    document.getElementById('typing-msg')?.remove();
-    addErrorMsg('Ошибка соединения. Проверь VPN и API ключ.');
-    messages.pop();
-  }
-
-  isLoading = false;
-  document.getElementById('send-btn').disabled = false;
+    if (parsed.loreFacts?.length) parsed.loreFacts.forEach(f => {
+      if (f.text && f.tag && gameState.memory.lore.length < 40) { gameState.memory.lore.push({tag:f.tag,text:f.text}); updated=true; }
+    });
+    if (parsed.npcFacts) Object.entries(parsed.npcFacts).forEach(([name,facts]) => {
+      if (!gameState.memory.npcFacts[name]) gameState.memory.npcFacts[name]=[];
+      facts.forEach(f => { if(f && !gameState.memory.npcFacts[name].includes(f) && gameState.memory.npcFacts[name].length<15){gameState.memory.npcFacts[name].push(f);updated=true;} });
+    });
+    if (parsed.newRelations) Object.entries(parsed.newRelations).forEach(([name,d]) => {
+      if (!gameState.relations[name]) gameState.relations[name]={love:0,friend:0};
+      if(d.loveDelta){gameState.relations[name].love=Math.max(0,Math.min(100,gameState.relations[name].love+d.loveDelta));updated=true;}
+      if(d.friendDelta){gameState.relations[name].friend=Math.max(0,Math.min(100,gameState.relations[name].friend+d.friendDelta));updated=true;}
+    });
+    if (updated) addMemoryFlash('Хроника обновлена');
+  } catch(e) { /* silent */ }
 }
 
 function addErrorMsg(text) {
@@ -1459,22 +1629,6 @@ function autoResize(el) {
 // ══════════════════════════════════════════
 //  START
 // ══════════════════════════════════════════
-function startApp() {
-  const key = document.getElementById('api-key-input').value.trim();
-  if (!key) return;
-  apiKey = key;
-  selectedModel = document.getElementById('model-select').value;
-  document.getElementById('api-screen').style.display = 'none';
-  document.getElementById('app').classList.add('visible');
-  initQuests();
-  updateStatusBar();
-  startSession();
-}
-
-document.getElementById('api-key-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') startApp();
-});
-
 async function startSession() {
   await sendToGroq('Начни сессию — приветствуй игрока и попроси выбрать персонажа.');
 }
@@ -1706,20 +1860,16 @@ function renderMemTab(tabId) {
   }
 }
 
-// ── SAVES ──
-const SAVE_KEY = 'playcare_saves_v3';
-function getSaves() { try { return JSON.parse(localStorage.getItem(SAVE_KEY) || '[]'); } catch { return []; } }
-function setSaves(s) { localStorage.setItem(SAVE_KEY, JSON.stringify(s)); }
-
+// ── SAVES (panel UI — delegates to session store) ──
 function renderSaves(el) {
-  const saves = getSaves();
+  const sessions = getSessions();
   el.innerHTML = `
     <div class="panel-header"><h3>💾 Сохранения</h3><button class="panel-close" onclick="closePanel()">✕</button></div>
     <div class="save-list" id="save-list-inner"></div>
     <button class="save-new-btn" onclick="saveGame()">💾 Сохранить текущую сессию</button>`;
   const list = el.querySelector('#save-list-inner');
-  if (!saves.length) { list.innerHTML = '<div class="inv-empty">Нет сохранений.</div>'; return; }
-  saves.forEach((s, idx) => {
+  if (!sessions.length) { list.innerHTML = '<div class="inv-empty">Нет сохранений.</div>'; return; }
+  sessions.forEach((s, idx) => {
     const d = document.createElement('div');
     d.className = 'save-slot';
     d.innerHTML = `
@@ -1728,62 +1878,23 @@ function renderSaves(el) {
         <div class="s-meta">${s.date} · ${s.msgs} сообщений</div>
       </div>
       <div class="save-slot-btns">
-        <button class="s-btn load" onclick="loadGame(${idx})">Загрузить</button>
+        <button class="s-btn load" onclick="loadSessionFromPanel(${idx})">Загрузить</button>
         <button class="s-btn del" onclick="deleteSave(${idx})">✕</button>
       </div>`;
     list.appendChild(d);
   });
 }
 
-function saveGame() {
-  const saves = getSaves();
-  const now = new Date();
-  saves.unshift({
-    char: gameState.char, level: gameState.level, tokens: gameState.tokens,
-    inventory: gameState.inventory, relations: gameState.relations,
-    achievements: gameState.achievements, memory: gameState.memory,
-    quests: gameState.quests,
-    messages: messages,
-    date: now.toLocaleDateString('ru') + ' ' + now.toLocaleTimeString('ru', { hour:'2-digit', minute:'2-digit' }),
-    msgs: messages.length,
-  });
-  if (saves.length > 5) saves.splice(5);
-  setSaves(saves);
-  closePanel();
-  toast('💾 Сессия сохранена!');
-}
-
-function loadGame(idx) {
-  const saves = getSaves();
-  const s = saves[idx];
-  if (!s) return;
-  gameState.char = s.char;
-  gameState.level = s.level;
-  gameState.tokens = s.tokens;
-  gameState.inventory = s.inventory || [];
-  gameState.relations = s.relations || {};
-  gameState.achievements = s.achievements || [];
-  gameState.memory = s.memory || { lore: [], npcFacts: {} };
-  gameState.quests = s.quests || [];
-  messages = s.messages || [];
-
-  // Rebuild chat DOM
-  const chat = document.getElementById('chat');
-  chat.innerHTML = '';
-  messages.forEach(m => {
-    const el = buildMsgDom(m);
-    chat.appendChild(el);
-  });
-  chat.scrollTop = 1e9;
-  updateStatusBar();
+function loadSessionFromPanel(idx) {
+  loadSession(idx);
   closePanel();
   toast('✅ Сессия загружена!');
 }
 
 function deleteSave(idx) {
-  const saves = getSaves();
-  saves.splice(idx, 1);
-  setSaves(saves);
+  const sessions = getSessions();
+  sessions.splice(idx, 1);
+  localStorage.setItem(SAVE_KEY_SESSIONS, JSON.stringify(sessions));
   openPanel('saves');
 }
 
