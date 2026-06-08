@@ -900,21 +900,28 @@ function parseAITags(text) {
 // ══════════════════════════════════════════
 //  MESSAGE RENDERING
 // ══════════════════════════════════════════
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
 function parseUserText(text) {
-  text = text.replace(/\*\*(.+?)\*\*/gs, '<strong class="rp-action">$1</strong>');
-  text = text.replace(/\*([^*\n]+?)\*/g, '<strong class="rp-action">$1</strong>');
-  text = text.replace(/"([^"]+)"/g, '<em class="rp-speech">"$1"</em>');
-  text = text.replace(/\n/g, '<br>');
-  return text;
+  const safe = escapeHtml(text);
+  return safe
+    .replace(/\*\*(.+?)\*\*/gs, '<strong class="rp-action">$1</strong>')
+    .replace(/\*([^*\n]+?)\*/g, '<em class="rp-speech">$1</em>')
+    .replace(/\n/g, '<br>');
 }
 
 function parseNarratorText(text) {
-  // Detect numbered choice lines (e.g. **1. Подойти к...** ) — make clickable
-  // Other **bold** — just bold, no click
-  return text
-    .replace(/\*\*(\d+\..+?)\*\*/g, (_, c) => `<strong class="choice-btn" onclick="clickChoice('${c.replace(/'/g, "\\'")}')">${c}</strong>`)
+  const safe = escapeHtml(text);
+  // Numbered choices **1. Текст** or **1) Текст** — clickable
+  return safe
+    .replace(/\*\*(\d+[\.\)]\s*.+?)\*\*/g, (_, c) => {
+      const clean = c.replace(/&quot;/g,"'");
+      return `<strong class="choice-btn" onclick="clickChoice(\`${clean}\`)">${c}</strong>`;
+    })
     .replace(/\*\*(.+?)\*\*/gs, '<strong class="rp-bold">$1</strong>')
-    .replace(/"([^"\n]+)"/g, '<em class="npc-speech">"$1"</em>')
+    .replace(/&quot;([^&\n]+?)&quot;/g, '<em class="npc-speech">"$1"</em>')
     .replace(/\n/g, '<br>');
 }
 
