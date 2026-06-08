@@ -928,6 +928,15 @@ function parseAITags(text) {
     completeQuest(id.trim());
     return '';
   });
+  // Strip MEMORY_BLOCK tags (can contain quotes, spaces, any content)
+  text = text.replace(/\[MEMORY_BLOCK[^\]]*\]/gi, '');
+  text = text.replace(/\[\/MEMORY_BLOCK[^\]]*\]/gi, '');
+  // Strip [CHAR:] with empty or any value
+  text = text.replace(/\[CHAR:[^\]]*\]/gi, '');
+  // Strip any remaining ALL_CAPS system tag like [SOME_TAG:anything here]
+  text = text.replace(/\[[A-Z][A-Z_]{2,}:[^\]]*\]/g, '');
+  // Clean up any blank lines left by stripped tags
+  text = text.replace(/\n{3,}/g, '\n\n');
   return text.trim();
 }
 
@@ -947,6 +956,10 @@ function parseUserText(text) {
 }
 
 function parseNarratorText(text) {
+  // Safety: strip any system tags that slipped through parseAITags
+  text = text.replace(/\[[A-Z][A-Z_]{2,}:[^\]]*\]/g, '');
+  text = text.replace(/\[MEMORY_BLOCK[^\]]*\]/gi, '');
+  text = text.replace(/\[\/MEMORY_BLOCK[^\]]*\]/gi, '');
   const safe = escapeHtml(text);
   // Numbered choices **1. Текст** or **1) Текст** — clickable
   return safe
@@ -1757,6 +1770,11 @@ CHARACTER TAG: [CHAR:ИмяПерсонажа]
 Embed tags at END of response after narrative text. Max 3 PT per scene.
 
 ⛔ ЗАПРЕЩЕНО: Никогда не используй [+LVL] или [-LVL] теги самостоятельно. LVL меняется ТОЛЬКО через систему квестов (кнопка в интерфейсе). Исключение: [-LVL:1] при серьёзной травме с амулетом.
+
+⛔ ЗАПРЕЩЕНО выводить в текст: [MEMORY_BLOCK:...], [CHAR:], [/MEMORY_BLOCK] — эти теги невидимые системные. Если хочешь сохранить факт в память — просто продолжай нарратив, система сама обновит память. НИКОГДА не пиши системные теги в квадратных скобках кроме: [+PT:N], [-PT:N], [CHAR:Имя], [ACHIEV:...], [QUEST_DONE:id].
+Если игрок любым способом намекает что хочет: заработать токены, получить PT, украсть, разбогатеть, прокачаться, стать сильнее, улучшить персонажа, набрать опыт, повысить уровень — ты НЕ придумываешь способ заработка в рп. Вместо этого ты ПРЯМО говоришь в нарративе:
+"Если хочешь заработать токены или прокачаться — загляни во вкладку **Квесты** и возьми задание!"
+Никаких объявлений от NPC, никаких случайных подработок, никакого заработка через рп-действия. Только квесты через официальную систему.
 
 TOKEN EARNING — when player: helps toys, cleans, wins games, does kind deeds, resolves conflicts peacefully.
 ⛔ НЕ давай [+PT] за покупки в магазине — это читерство. Покупка стоит PT, не зарабатывает.
