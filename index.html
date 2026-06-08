@@ -675,6 +675,17 @@
     Получить бесплатно: <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com</a><br>
     <span style="font-size:0.75rem;color:var(--text-dim)">Sign in → Get API key → Create API key</span></p>
     <input type="password" id="api-key-input" placeholder="AIza..." autocomplete="off" />
+    <select id="model-select" style="
+      width:100%; padding:10px 14px; margin-bottom:8px;
+      background:#1a1025; border:1px solid rgba(192,132,252,0.3);
+      border-radius:10px; color:#e2d9f3; font-family:'Cinzel',serif;
+      font-size:0.78rem; cursor:pointer; outline:none;
+    ">
+      <option value="gemini-2.0-flash">⚡ Gemini 2.0 Flash — стабильный</option>
+      <option value="gemini-2.5-flash" selected>🌟 Gemini 2.5 Flash — умнее (может быть занят)</option>
+      <option value="gemini-2.5-pro">🔥 Gemini 2.5 Pro — самый мощный (медленнее)</option>
+      <option value="gemini-3.5-flash">✨ Gemini 3.5 Flash — новейший</option>
+    </select>
     <button class="btn-primary" onclick="startApp()">ВОЙТИ В PLAYCARE</button>
     <p class="api-note">🔒 Ключ хранится только в памяти сессии</p>
   </div>
@@ -745,8 +756,9 @@ let isLoading = false;
 let messages = [];   // { id, role:'user'|'assistant', content, snapshot }
 
 // History for API — rebuilt from messages on each call (last N only)
-const CTX_WINDOW = 12; // how many messages sent to API
-let memUpdateCounter = 0; // throttle memory updates
+const CTX_WINDOW = 12;
+let memUpdateCounter = 0;
+let selectedModel = 'gemini-2.5-flash';
 
 let gameState = {
   char: null,
@@ -1251,7 +1263,7 @@ ${JSON.stringify(gameState.memory.npcFacts)}
 
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1349,7 +1361,7 @@ async function sendToGroq(userText) {
 
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1451,6 +1463,7 @@ function startApp() {
   const key = document.getElementById('api-key-input').value.trim();
   if (!key) return;
   apiKey = key;
+  selectedModel = document.getElementById('model-select').value;
   document.getElementById('api-screen').style.display = 'none';
   document.getElementById('app').classList.add('visible');
   initQuests();
