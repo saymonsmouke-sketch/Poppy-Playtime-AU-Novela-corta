@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PLAYCARE — Живые Игрушки</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&family=Creepster&display=swap');
+
+:root {
+  --bg:       #0c0a13;
+  --surf:     #141020;
+  --surf2:    #1c1630;
+  --border:   #2a1e45;
+  --text:     #e8dff5;
+  --dim:      #7a6a99;
+  --accent:   #b57bee;
+  --pink:     #f472b6;
+  --red:      #e05252;
+  --green:    #5ecc8a;
+  --gold:     #f5b642;
+  --glow:     0 0 22px rgba(181,123,238,.35);
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{min-height:100vh;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Nunito',sans-serif;
+  display:flex;flex-direction:column;align-items:center;
+}
+
+/* ── SCREENS ── */
+.screen{display:none;width:100%;max-width:660px;padding:0 16px 56px;}
+.screen.active{display:flex;flex-direction:column;}
+
+/* ════════════════ TITLE ════════════════ */
+#s-title{
+  align-items:center;justify-content:center;
+  min-height:100vh;text-align:center;gap:0;
+}
+.lamp-anim{font-size:3.2rem;animation:lamp 3s ease-in-out infinite;margin-bottom:28px;}
+@keyframes lamp{0%,100%{filter:brightness(1);}50%{filter:brightness(1.7) drop-shadow(0 0 18px #f5b642);}}
+.title-logo{
+  font-family:'Creepster',cursive;
+  font-size:clamp(3rem,11vw,5.2rem);
+  color:var(--accent);
+  text-shadow:0 0 40px rgba(181,123,238,.7),0 0 90px rgba(181,123,238,.25);
+  letter-spacing:.12em;line-height:1;margin-bottom:6px;
+}
+.title-tag{font-size:.78rem;letter-spacing:.28em;color:var(--dim);text-transform:uppercase;margin-bottom:44px;}
+.intro-card{
+  background:linear-gradient(135deg,rgba(181,123,238,.1),rgba(244,114,182,.07));
+  border:1px solid rgba(181,123,238,.25);border-radius:18px;
+  padding:22px 20px;max-width:400px;margin-bottom:40px;
+}
+.intro-card p{font-size:.88rem;line-height:1.7;color:var(--dim);}
+.intro-card strong{color:var(--text);}
+
+/* ════════════════ CREATE ════════════════ */
+#s-create{padding-top:36px;gap:22px;}
+.create-head{margin-bottom:4px;}
+.create-title{font-family:'Creepster',cursive;font-size:1.9rem;color:var(--accent);letter-spacing:.07em;}
+.create-sub{font-size:.8rem;color:var(--dim);margin-top:4px;}
+
+.field-lbl{font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:7px;}
+
+input[type=text]{
+  width:100%;background:var(--surf2);border:1px solid var(--border);
+  border-radius:11px;padding:12px 15px;color:var(--text);
+  font-family:'Nunito',sans-serif;font-size:.97rem;outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+input[type=text]:focus{border-color:var(--accent);box-shadow:var(--glow);}
+input[type=text]::placeholder{color:var(--dim);}
+
+/* emoji picker */
+.emoji-section{display:flex;flex-direction:column;gap:8px;}
+.emoji-selected{
+  width:62px;height:62px;border-radius:14px;
+  background:var(--surf2);border:2px solid var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  font-size:2rem;cursor:pointer;transition:transform .15s;
+  user-select:none;
+}
+.emoji-selected:hover{transform:scale(1.07);}
+.emoji-grid-wrap{
+  background:var(--surf2);border:1px solid var(--border);
+  border-radius:14px;padding:12px;
+  display:none;
+}
+.emoji-grid-wrap.open{display:block;}
+.emoji-cats{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.emoji-cat-btn{
+  background:var(--surf);border:1px solid var(--border);border-radius:8px;
+  padding:4px 10px;font-size:.72rem;color:var(--dim);cursor:pointer;
+  font-family:'Nunito',sans-serif;transition:all .15s;
+}
+.emoji-cat-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(181,123,238,.1);}
+.emoji-options{display:flex;flex-wrap:wrap;gap:6px;}
+.emoji-opt{
+  width:38px;height:38px;border-radius:9px;background:var(--surf);
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+  font-size:1.4rem;cursor:pointer;transition:all .15s;
+}
+.emoji-opt:hover{border-color:var(--accent);transform:scale(1.12);}
+
+/* gender tabs */
+.gender-tabs{display:flex;gap:8px;}
+.g-btn{
+  flex:1;padding:10px 6px;border-radius:11px;
+  border:1px solid var(--border);background:var(--surf);
+  color:var(--dim);font-family:'Nunito',sans-serif;font-size:.83rem;
+  font-weight:700;cursor:pointer;transition:all .18s;
+}
+.g-btn.sel-m{border-color:#60a5fa;color:#60a5fa;background:rgba(96,165,250,.09);}
+.g-btn.sel-f{border-color:var(--pink);color:var(--pink);background:rgba(244,114,182,.09);}
+.g-btn.sel-n{border-color:var(--green);color:var(--green);background:rgba(94,204,138,.09);}
+
+/* main button */
+.btn-main{
+  background:linear-gradient(135deg,var(--accent),var(--pink));
+  border:none;border-radius:13px;padding:14px 28px;
+  color:#fff;font-family:'Nunito',sans-serif;font-size:1rem;
+  font-weight:900;cursor:pointer;letter-spacing:.05em;
+  transition:all .2s;box-shadow:0 4px 22px rgba(181,123,238,.4);width:100%;
+}
+.btn-main:hover{transform:translateY(-2px);box-shadow:0 7px 30px rgba(181,123,238,.55);}
+.btn-main:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none;}
+
+/* ════════════════ GAME ════════════════ */
+#s-game{padding-top:0;gap:0;}
+
+.top-bar{
+  position:sticky;top:0;z-index:20;
+  background:rgba(12,10,19,.92);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+  padding:9px 16px;display:flex;justify-content:space-between;align-items:center;
+  width:100%;max-width:660px;
+}
+.player-chip{
+  display:flex;align-items:center;gap:9px;
+}
+.player-emo{font-size:1.5rem;line-height:1;}
+.player-info{display:flex;flex-direction:column;}
+.player-nm{font-size:.88rem;font-weight:900;color:var(--accent);}
+.player-sp{font-size:.68rem;color:var(--dim);}
+
+.token-badge{
+  background:rgba(245,182,66,.13);border:1px solid rgba(245,182,66,.35);
+  border-radius:20px;padding:5px 13px;font-size:.8rem;font-weight:700;color:var(--gold);
+}
+
+/* relation bar */
+#rel-panel{display:none;padding:10px 16px 0;}
+.rel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.rel-who{font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);}
+.rel-pct{font-size:.7rem;font-weight:900;color:var(--accent);}
+.rel-bg{height:5px;background:var(--surf2);border-radius:99px;overflow:hidden;}
+.rel-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--pink),var(--accent));transition:width .7s cubic-bezier(.4,0,.2,1);}
+.rel-stage{font-size:.68rem;color:var(--accent);font-weight:700;margin-top:4px;text-align:right;}
+
+/* story */
+.story-wrap{display:flex;flex-direction:column;gap:14px;padding:14px 0;}
+
+.s-block{
+  background:var(--surf);border:1px solid var(--border);
+  border-radius:15px;padding:16px 15px;
+  animation:fade .4s ease;
+}
+@keyframes fade{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:none;}}
+.s-player{background:rgba(181,123,238,.07);border-color:rgba(181,123,238,.22);}
+.s-narrator{background:rgba(255,255,255,.025);border-color:rgba(255,255,255,.06);}
+
+.npc-row{display:flex;align-items:center;gap:8px;margin-bottom:9px;}
+.npc-emo{font-size:1.35rem;line-height:1;}
+.npc-nm{font-size:.72rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;}
+
+.s-text{font-size:.93rem;line-height:1.72;color:var(--text);}
+.s-text em{color:var(--dim);font-style:italic;}
+
+/* choices */
+.choices-wrap{display:flex;flex-direction:column;gap:7px;padding:6px 0 4px;animation:fade .45s ease;}
+.ch-btn{
+  background:var(--surf);border:1px solid var(--border);border-radius:12px;
+  padding:13px 15px;color:var(--text);font-family:'Nunito',sans-serif;
+  font-size:.9rem;font-weight:700;cursor:pointer;text-align:left;
+  display:flex;align-items:center;gap:10px;transition:all .18s;
+}
+.ch-btn:hover{border-color:var(--accent);background:rgba(181,123,238,.09);transform:translateX(4px);}
+.ch-num{
+  background:var(--surf2);border-radius:7px;padding:2px 8px;
+  font-size:.72rem;color:var(--accent);font-weight:900;flex-shrink:0;
+}
+
+/* notif */
+.notif{
+  position:fixed;bottom:22px;left:50%;
+  transform:translateX(-50%) translateY(55px);opacity:0;
+  background:var(--surf2);border:1px solid var(--accent);border-radius:12px;
+  padding:9px 20px;font-size:.83rem;font-weight:700;color:var(--accent);
+  transition:transform .3s cubic-bezier(.4,0,.2,1),opacity .3s;
+  z-index:100;white-space:nowrap;
+}
+.notif.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+/* modal */
+.modal-ov{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.72);z-index:200;
+  align-items:center;justify-content:center;padding:16px;
+}
+.modal-ov.open{display:flex;}
+.modal-box{
+  background:var(--surf);border:1px solid var(--border);
+  border-radius:20px;padding:28px 22px;max-width:400px;width:100%;
+  animation:fade .3s ease;
+}
+.modal-ttl{font-size:1.1rem;font-weight:900;color:var(--pink);margin-bottom:11px;}
+.modal-txt{font-size:.88rem;line-height:1.65;color:var(--text);margin-bottom:20px;}
+.modal-btns{display:flex;gap:9px;}
+.modal-btns button{flex:1;border-radius:11px;padding:12px;font-family:'Nunito',sans-serif;font-weight:900;font-size:.88rem;cursor:pointer;border:none;transition:opacity .2s;}
+.btn-red{background:linear-gradient(135deg,#e05252,#b83232);color:#fff;}
+.btn-red:hover{opacity:.85;}
+.btn-mercy{background:var(--surf2);border:1px solid var(--accent)!important;border-style:solid;color:var(--accent);}
+.btn-mercy:hover{background:rgba(181,123,238,.1);}
+
+/* divider */
+.divider{height:1px;background:var(--border);margin:2px 0;}
+
+/* player input */
+.input-row{display:none;gap:8px;padding:10px 0 2px;}
+.input-row input{flex:1;padding:11px 14px;font-size:.88rem;}
+.send-btn{
+  background:var(--surf2);border:1px solid var(--border);border-radius:10px;
+  padding:11px 15px;color:var(--accent);font-size:1.1rem;cursor:pointer;
+  transition:all .18s;flex-shrink:0;
+}
+.send-btn:hover{border-color:var(--accent);background:rgba(181,123,238,.12);}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ TITLE ═══════════ -->
+<div id="s-title" class="screen active">
+  <div class="lamp-anim">💡</div>
+  <div class="title-logo">PLAYCARE</div>
+  <div class="title-tag">Живые Игрушки · Визуальная Новелла</div>
+  <div class="intro-card">
+    <p>Глубоко под землёй — огромный купол. Лампа-солнце. Живые игрушки.<br><br>
+    <strong>Мамочка Лонг Ленг нашла тебя в мусоропроводе и дала тебе дом.</strong><br><br>
+    Добро пожаловать в Playcare. Выхода нет. Но место для тебя — найдётся.</p>
+  </div>
+  <button class="btn-main" style="max-width:280px;" onclick="goTo('s-create')">▶ Начать историю</button>
+</div>
+
+<!-- ═══════════ CREATE ═══════════ -->
+<div id="s-create" class="screen">
+  <div class="create-head">
+    <div class="create-title">Создай персонажа</div>
+    <div class="create-sub">Придумай свою игрушку — имя, вид, внешность</div>
+  </div>
+
+  <!-- EMOJI -->
+  <div class="emoji-section">
+    <div class="field-lbl">Иконка персонажа</div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="emoji-selected" id="emo-preview" onclick="toggleEmojiGrid()">🐾</div>
+      <div style="font-size:.8rem;color:var(--dim);">Нажми, чтобы выбрать смайлик</div>
+    </div>
+    <div class="emoji-grid-wrap" id="emo-grid">
+      <div class="emoji-cats" id="emo-cats"></div>
+      <div class="emoji-options" id="emo-opts"></div>
+    </div>
+  </div>
+
+  <!-- NAME -->
+  <div>
+    <div class="field-lbl">Имя персонажа</div>
+    <input type="text" id="inp-name" placeholder="Например: Ксави, Миро, Лира..." maxlength="24" oninput="validate()">
+  </div>
+
+  <!-- SPECIES -->
+  <div>
+    <div class="field-lbl">Вид животного</div>
+    <input type="text" id="inp-species" placeholder="Например: летучая мышь, лис, волк..." maxlength="32" oninput="validate()">
+  </div>
+
+  <!-- APPEARANCE -->
+  <div>
+    <div class="field-lbl">Цвет и внешность <span style="color:var(--dim);font-size:.65rem;">(необязательно)</span></div>
+    <input type="text" id="inp-look" placeholder="Например: серый, с синими пятнами..." maxlength="60">
+  </div>
+
+  <!-- GENDER -->
+  <div>
+    <div class="field-lbl">Пол / местоимения</div>
+    <div class="gender-tabs">
+      <button class="g-btn" id="g-m" onclick="setGender('m')">♂ Он</button>
+      <button class="g-btn" id="g-f" onclick="setGender('f')">♀ Она</button>
+      <button class="g-btn" id="g-n" onclick="setGender('n')">◈ Они</button>
+    </div>
+  </div>
+
+  <button class="btn-main" id="btn-start" onclick="startGame()" disabled>Войти в Playcare →</button>
+</div>
+
+<!-- ═══════════ GAME ═══════════ -->
+<div id="s-game" class="screen">
+  <div class="top-bar">
+    <div class="player-chip">
+      <div class="player-emo" id="bar-emo">🐾</div>
+      <div class="player-info">
+        <div class="player-nm" id="bar-name">???</div>
+        <div class="player-sp" id="bar-sp">???</div>
+      </div>
+    </div>
+    <div class="token-badge" id="bar-tokens">🪙 0</div>
+  </div>
+
+  <div id="rel-panel">
+    <div class="rel-header">
+      <span class="rel-who">🦇 Раби — Отношения</span>
+      <span class="rel-pct" id="rel-pct">0%</span>
+    </div>
+    <div class="rel-bg"><div class="rel-fill" id="rel-fill" style="width:0%"></div></div>
+    <div class="rel-stage" id="rel-stage">Незнакомцы</div>
+  </div>
+
+  <div class="story-wrap" id="story-wrap"></div>
+  <div id="choices-wrap" class="choices-wrap" style="padding:0;"></div>
+  <div class="input-row" id="input-row">
+    <input type="text" id="player-txt" placeholder="Напиши что-то..." maxlength="200" onkeydown="if(event.key==='Enter')sendTxt()">
+    <button class="send-btn" onclick="sendTxt()">➤</button>
+  </div>
+</div>
+
+<!-- DOCS MODAL -->
+<div class="modal-ov" id="modal-docs">
+  <div class="modal-box">
+    <div class="modal-ttl">📁 Секреты Раби</div>
+    <div class="modal-txt">
+      В твоих руках — документы, фотографии и личный дневник Раби.
+      Здесь всё: тайные связи с Кошмарными Зверятами, тёмные делишки,
+      и то, чего не должна знать <strong>Мамочка Лонг Ленг</strong>.<br><br>
+      Если это попадёт к ней — Раби отправят к <em>Папочке</em>. А потом — в подвал.
+    </div>
+    <div class="modal-btns">
+      <button class="btn-red" onclick="chooseBetrayal()">🗣️ Рассказать Мамочке</button>
+      <button class="btn-mercy" onclick="chooseMercy()">🤫 Промолчать</button>
+    </div>
+  </div>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script>
+// ═══════════ EMOJI DATA ═══════════
+const EMOJI_CATS = {
+  '🐾 Зверята': ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐔','🐧','🐦','🦆','🦉','🦇','🐺','🐗','🐴','🦄','🐝','🦋','🐛','🐌','🐙','🦑','🦀','🐡','🐠','🐟','🐊','🐢','🦎','🐍','🦕','🦖','🦓','🦍','🦧','🦣','🐘','🦛','🦏','🐪','🐫','🦒','🦘','🦬','🐃','🐂','🐄','🐎','🐖','🐏','🐑','🦙','🐐','🦌','🐕','🐩','🦮','🐈','🐓','🦃','🦤','🦚','🦜','🦢','🕊','🐇','🦝','🦨','🦡','🦦','🦥','🐁','🐀','🦔'],
+  '✨ Фэнтези': ['🐲','🐉','🦄','👾','👻','💀','☠️','🎃','🧿','🔮','⚡','🌙','⭐','🌟','💫','✨','🌈','🌊','🔥','❄️','🌪','🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘'],
+  '💎 Символы': ['💜','💗','🖤','🩷','🩵','🩶','❤️','🧡','💛','💚','💙','🤍','🤎','💔','💕','💞','💓','💝','🩸','💀','⚰️','🪦','👁️','🌸','🌺','🌻','🌹','🌷'],
+};
+
+let selEmoji = '🐾';
+let activeCat = Object.keys(EMOJI_CATS)[0];
+
+function buildEmojiGrid() {
+  const catsEl = document.getElementById('emo-cats');
+  const optsEl = document.getElementById('emo-opts');
+  catsEl.innerHTML = '';
+  Object.keys(EMOJI_CATS).forEach(cat => {
+    const b = document.createElement('button');
+    b.className = 'emoji-cat-btn' + (cat === activeCat ? ' active' : '');
+    b.textContent = cat;
+    b.onclick = () => {
+      activeCat = cat;
+      document.querySelectorAll('.emoji-cat-btn').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      renderEmojiOpts();
+    };
+    catsEl.appendChild(b);
+  });
+  renderEmojiOpts();
+}
+
+function renderEmojiOpts() {
+  const optsEl = document.getElementById('emo-opts');
+  optsEl.innerHTML = '';
+  EMOJI_CATS[activeCat].forEach(e => {
+    const d = document.createElement('div');
+    d.className = 'emoji-opt';
+    d.textContent = e;
+    d.onclick = () => {
+      selEmoji = e;
+      document.getElementById('emo-preview').textContent = e;
+      document.getElementById('emo-grid').classList.remove('open');
+    };
+    optsEl.appendChild(d);
+  });
+}
+
+function toggleEmojiGrid() {
+  const g = document.getElementById('emo-grid');
+  if (!g.classList.contains('open')) { buildEmojiGrid(); g.classList.add('open'); }
+  else g.classList.remove('open');
+}
+
+// ═══════════ GENDER ═══════════
+let selGender = null; // 'm' | 'f' | 'n'
+
+function setGender(g) {
+  selGender = g;
+  ['m','f','n'].forEach(x => {
+    document.getElementById('g-'+x).className = 'g-btn' + (x===g ? ' sel-'+x : '');
+  });
+  validate();
+}
+
+function validate() {
+  const ok = document.getElementById('inp-name').value.trim().length > 0
+          && document.getElementById('inp-species').value.trim().length > 0
+          && selGender !== null;
+  document.getElementById('btn-start').disabled = !ok;
+}
+
+// ═══════════ STATE ═══════════
+const G = {
+  name:'', species:'', look:'', gender:'f', emoji:'🐾',
+  tokens:0, rel:0,
+  phase:'intro', betrayed:null,
+  scene:0,
+};
+
+// pronouns helper
+function pro(m,f,n){ return G.gender==='m'?m:G.gender==='f'?f:n; }
+// "он/она/они"
+const P = {
+  nom:()=>pro('он','она','они'),
+  gen:()=>pro('его','её','их'),
+  acc:()=>pro('его','её','их'),
+  ins:()=>pro('им','ей','ими'),
+  prep:()=>pro('нём','ней','них'),
+  adj_short:()=>pro('(-ой)','(-ая/-ой)','(-ые)'),
+  suf:()=>pro('','(-а)',''),  // глагольный суффикс: пришёл / пришла / пришли
+  verb:s=>pro(s, s.replace(/л\b/,'ла').replace(/лся\b/,'лась'), s.replace(/л\b/,'ли').replace(/лся\b/,'лись')),
+};
+
+function startGame() {
+  G.name    = document.getElementById('inp-name').value.trim();
+  G.species = document.getElementById('inp-species').value.trim();
+  G.look    = document.getElementById('inp-look').value.trim();
+  G.gender  = selGender;
+  G.emoji   = selEmoji;
+
+  document.getElementById('bar-emo').textContent  = G.emoji;
+  document.getElementById('bar-name').textContent = G.name;
+  document.getElementById('bar-sp').textContent   = G.species + (G.look ? ' · ' + G.look : '');
+  updateTokens(0);
+
+  goTo('s-game');
+  startStory();
+}
+
+// ═══════════ NAV ═══════════
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ═══════════ STORY HELPERS ═══════════
+function addBlock(emoStr, nameStr, color, html, cls='') {
+  const w = document.getElementById('story-wrap');
+  const d = document.createElement('div');
+  d.className = 's-block ' + cls;
+  d.innerHTML = `
+    <div class="npc-row">
+      <span class="npc-emo">${emoStr}</span>
+      <span class="npc-nm" style="color:${color}">${nameStr}</span>
+    </div>
+    <div class="s-text">${html}</div>`;
+  w.appendChild(d);
+  d.scrollIntoView({behavior:'smooth',block:'end'});
+}
+function narr(html) {
+  addBlock('💡','Повествование','#5a4d7a', html, 's-narrator');
+}
+function npc(emo,name,color,html) { addBlock(emo,name,color,html); }
+function player(html) {
+  addBlock(G.emoji, G.name, 'var(--accent)', html, 's-player');
+}
+
+function setChoices(list) {
+  const w = document.getElementById('choices-wrap');
+  w.innerHTML = '';
+  list.forEach((c,i) => {
+    const b = document.createElement('button');
+    b.className = 'ch-btn';
+    b.innerHTML = `<span class="ch-num">${i+1}</span>${c.t}`;
+    b.onclick = c.a;
+    w.appendChild(b);
+  });
+  w.scrollIntoView({behavior:'smooth',block:'end'});
+}
+function clrChoices(){ document.getElementById('choices-wrap').innerHTML=''; }
+
+function updateTokens(d) {
+  G.tokens += d;
+  document.getElementById('bar-tokens').textContent = '🪙 ' + G.tokens;
+  if (d>0) notif(`+${d} токен${d>1?'а':''} 🪙`);
+}
+
+function updateRel(d) {
+  G.rel = Math.max(0, Math.min(100, G.rel+d));
+  document.getElementById('rel-panel').style.display = 'block';
+  document.getElementById('rel-fill').style.width = G.rel+'%';
+  document.getElementById('rel-pct').textContent = G.rel+'%';
+  const stages = [[80,'💕 Отношения'],[55,'💛 Близкие друзья'],[30,'😊 Приятели'],[10,'😐 Нейтрально'],[0,'Незнакомцы']];
+  const st = stages.find(s=>G.rel>=s[0]);
+  document.getElementById('rel-stage').textContent = st?st[1]:'Незнакомцы';
+}
+
+function notif(msg) {
+  const n = document.getElementById('notif');
+  n.textContent = msg; n.classList.add('show');
+  setTimeout(()=>n.classList.remove('show'), 2600);
+}
+
+// color shorthands
+const C = {
+  rabi:   '#f9a8d4',
+  simon:  '#fca5a5',
+  mama:   '#c084fc',
+  day:    '#fb923c',
+  bubba:  '#93c5fd',
+  ally:   '#6ee7b7',
+  narr:   '#5a4d7a',
+};
+
+// ═══════════ SCENES ═══════════
+function startStory() {
+  document.getElementById('story-wrap').innerHTML = '';
+  clrChoices();
+  sc_intro();
+}
+
+/* ── Интро ── */
+function sc_intro() {
+  G.phase = 'intro';
+  narr(`<em>Лампа-солнце мигает раз, другой — и разгорается ровным тёплым светом. Playcare просыпается.</em><br><br>
+    Ты ${P.verb('помнил')} мусоропровод, темноту, скрежет — а потом длинные розовые руки и голос: <em>"Бедняжка, нашёлся!"</em>
+    Это была <strong style="color:${C.mama}">Мамочка Лонг Ленг</strong>. Она ${P.verb('назвала')} тебя <strong style="color:var(--accent)">${G.name}</strong> и ${P.verb('дала')} комнату в огромном подземном куполе.`);
+
+  setTimeout(()=>{
+    npc('👩','Мамочка Лонг Ленг',C.mama,
+      `— <strong style="color:var(--accent)">${G.name}!</strong> — её голос звенит из коридора, тёплый, как свежая выпечка. — Завтрак стынет, моя дорогая ${G.species}! Сегодня первый по-настоящему <em>твой</em> день. Иди знакомиться — здесь все свои!`);
+    setTimeout(()=>{
+      setChoices([
+        {t:'Выйти в коридор и осмотреться',        a:sc_corridor},
+        {t:'Поблагодарить Мамочку и спросить про столовую', a:sc_mama_talk},
+      ]);
+    },300);
+  },600);
+}
+
+function sc_mama_talk() {
+  clrChoices();
+  player(`— Мамочка, спасибо за всё... А где тут столовая?`);
+  setTimeout(()=>{
+    npc('👩','Мамочка Лонг Ленг',C.mama,
+      `Она улыбается — широко, искренне. Длинная рука указывает в конец коридора. — <em>Прямо и налево, мой хороший ${G.species}.</em> Там уже собираются. Она чуть наклоняется: — <strong>И не обращай внимания на Раби. Она бывает резкой с новенькими.</strong>`);
+    setTimeout(()=>sc_corridor(), 400);
+  },400);
+}
+
+/* ── Коридор ── */
+function sc_corridor() {
+  clrChoices();
+  narr(`Коридор «Дома Милого Дома» длинный и шумный. Из-за угла несётся смех — это <strong style="color:${C.ally}">Хоппи</strong> вихрем мчится к столовой. Запах завтрака перебивает всё. Кто-то шепчет.`);
+  setTimeout(()=>{
+    npc('🦇','Раби',C.rabi,
+      `У стены — белоснежная летучая мышь с розовыми крыльями. Кулон-капля крови покачивается на шее. Она смотрит <em>на тебя</em> с холодным любопытством, наклоняется к тёмно-зелёному аллигатору рядом и что-то шепчет. Оба смотрят. Раби усмехается.<br><br>— <em>Мусоропроводный подарочек,</em> — произносит она негромко, но так, чтобы ты ${P.verb('слышал')}.`);
+    setTimeout(()=>{
+      setChoices([
+        {t:'Сделать вид, что не слышал(-а), и пройти мимо', a:sc_ignore_rabi},
+        {t:'Остановиться и посмотреть Раби в глаза',         a:sc_stare_rabi},
+        {t:'Зайти в столовую — там виден Дэй',               a:sc_dining},
+      ]);
+    },300);
+  },700);
+}
+
+function sc_ignore_rabi() {
+  clrChoices();
+  player(`<em>(${P.verb('проходишь')} мимо, не оглядываясь)</em>`);
+  setTimeout(()=>{
+    npc('🦇','Раби',C.rabi,`За спиной — тихий смех. — <em>Ой, оно даже не умеет отвечать.</em> Аллистер лениво зевает рядом.`);
+    setTimeout(()=>sc_dining(), 500);
+  },400);
+}
+
+function sc_stare_rabi() {
+  clrChoices();
+  player(`<em>(${P.verb('останавливаешься')} и смотришь ей прямо в глаза — молча)</em>`);
+  setTimeout(()=>{
+    npc('🦇','Раби',C.rabi,
+      `Она не ожидала. На секунду в её взгляде — что-то похожее на удивление. Потом снова маска. — Смотри-смотри. <em>${G.name} с претензиями.</em> Она отворачивается, но пальцы сжимаются на кулоне чуть крепче.`);
+    updateRel(5); notif('Раби заметила тебя (+5)');
+    setTimeout(()=>sc_dining(), 600);
+  },400);
+}
+
+/* ── Столовая ── */
+function sc_dining() {
+  clrChoices();
+  narr(`Столовая гудит. <strong style="color:${C.day}">Дэй</strong> — оранжевый пёс с красными ушами — машет тебе с такой радостью, будто знает тебя всю жизнь. Рядом — голубой слон <strong style="color:${C.bubba}">Бубба</strong> с книгой. Где-то позади — отзвук крыльев. Раби ${P.verb('зашёл')}... вошла следом.`);
+  setTimeout(()=>{
+    npc('🐶','Дэй',C.day,
+      `— О, ты ${G.name}! ♂ Мамочка говорила! — тянет руку. — Я Дэй. Это лучшее место, серьёзно! Минус то, что выхода нет, но зато завтрак всегда горячий!`);
+    setTimeout(()=>{
+      setChoices([
+        {t:'Сесть рядом с Дэем и Буббой',       a:sc_sit_day},
+        {t:'Взять еду и наблюдать из стороны',   a:sc_observe},
+      ]);
+    },300);
+  },600);
+}
+
+function sc_sit_day() {
+  clrChoices();
+  player(`— Приятно познакомиться, Дэй. — <em>садишься рядом</em>`);
+  updateTokens(1);
+  setTimeout(()=>{
+    npc('🐘','Бубба',C.bubba,
+      `♂ — Добро пожаловать. Если захочешь в библиотеку — покажу. Там тихо. — <em>утыкается обратно в книгу</em>`);
+    setTimeout(()=>{
+      narr(`Завтрак идёт своим чередом. Но ты замечаешь: через три стола от тебя Раби шепчет <strong style="color:${C.simon}">Саймону</strong> — светло-алому дракону с золотыми рогами и серьгами. Тот смотрит в твою сторону и лениво ухмыляется.`);
+      setTimeout(()=>{
+        setChoices([
+          {t:'Не обращать внимания — завтрак важнее', a:sc_end_breakfast},
+          {t:'Поймать взгляд Саймона и не отводить',  a:sc_simon_stare},
+        ]);
+      },400);
+    },600);
+  },400);
+}
+
+function sc_observe() {
+  clrChoices();
+  player(`<em>(берёшь поднос и садишься в сторонке — наблюдаешь)</em>`);
+  setTimeout(()=>{
+    narr(`С этой точки видно всё. Раби — в центре, как всегда. Она шепчет что-то <strong style="color:${C.simon}">Саймону</strong>, кивает в твою сторону. Дракон смотрит оценивающе. Ты замечаешь: в руке у Раби что-то блестит. Маленький потрёпанный блокнот.`);
+    setTimeout(()=>{
+      setChoices([
+        {t:'Запомнить блокнот — потом разберёмся', a:sc_end_breakfast},
+        {t:'Подойти к Саймону — пусть привыкает',  a:sc_simon_stare},
+      ]);
+    },400);
+  },500);
+}
+
+function sc_simon_stare() {
+  clrChoices();
+  player(`<em>(смотришь на Саймона — спокойно, не отводя взгляда)</em>`);
+  setTimeout(()=>{
+    npc('🐉','Саймон',C.simon,
+      `♂ Дракон приподнимает бровь с серьгой. Усмехается — медленно, нехотя. — <em>О. Новенький(-ая) с характером.</em> Кидает что-то Раби — та дёргается, ловит, прячет. Саймон отворачивается первым, но улыбка остаётся.`);
+    updateRel(3);
+    setTimeout(()=>sc_end_breakfast(), 500);
+  },400);
+}
+
+/* ── После завтрака ── */
+function sc_end_breakfast() {
+  clrChoices();
+  G.scene = 2; G.phase = 'rabi_bully';
+  narr(`Завтрак заканчивается. День в Playcare начинается — школа, свободное время, парк. Но ещё до уроков ты слышишь: кто-то смеётся. И слышишь своё имя — в чужих ртах, с интонацией, которая не сулит ничего хорошего. <em>Раби начала работу.</em>`);
+  setTimeout(()=>{
+    npc('🦇','Раби',C.rabi,
+      `♀ Она стоит у доски объявлений. Вокруг несколько игрушек. — Слышали? <strong style="color:var(--accent)">${G.name}</strong> живёт здесь, потому что от ${P.gen()} избавились. Как от мусора. — Хихикает. — Ой, я просто <em>рассказала</em> что видела в документах Мамочки...`);
+    setTimeout(()=>{
+      setChoices([
+        {t:'Пройти мимо — слова не ранят',       a:sc_rabi_walk},
+        {t:'— Это правда. И что с того?',         a:sc_rabi_confront},
+        {t:'Уйти в парк — подумать в тишине',     a:sc_park},
+      ]);
+    },400);
+  },700);
+}
+
+function sc_rabi_walk() {
+  clrChoices();
+  player(`<em>(${P.verb('проходишь')} мимо молча — голова прямо)</em>`);
+  setTimeout(()=>{
+    narr(`Смех стихает быстрее, чем ты ожидал(-а). Кто-то из толпы — кажется, красная медведица <strong>Бобби</strong> ♀ — смотрит с тихим уважением. Раби провожает взглядом. <em>Ей не понравилось, что ты не сломал(-ась).</em>`);
+    updateRel(4);
+    setTimeout(()=>sc_park(), 500);
+  },400);
+}
+
+function sc_rabi_confront() {
+  clrChoices();
+  player(`— Это правда. И что с того?`);
+  setTimeout(()=>{
+    npc('🦇','Раби',C.rabi,
+      `♀ Она моргает. Не ожидала прямого ответа. Толпа притихла. Раби снова улыбается — но чуть напряжённее. — <em>Ничего. Просто... интересно.</em> Уходит быстро. Аллистер ♂ зевает ей вслед.`);
+    updateRel(8); updateTokens(2);
+    notif('Ты не сломал(-ась). +2 токена 💪');
+    setTimeout(()=>sc_park(), 600);
+  },500);
+}
+
+/* ── Парк ── */
+function sc_park() {
+  clrChoices();
+  G.scene = 3;
+  narr(`Парк в центре Playcare. Статуя Папочки Лонг Ленга смотрит сверху — с лёгкой официальной улыбкой. Под ней — подвал с генератором. Здесь тихо... пока.`);
+  setTimeout(()=>{
+    narr(`Ты почти один(-а). Но у скамейки — силуэт в тени. Белоснежный мех, розовые крылья. Раби сидит одна — что-то листает. <strong>Тот самый блокнот.</strong> Она не замечает тебя. Или делает вид.`);
+    setTimeout(()=>{
+      setChoices([
+        {t:'Подойти и сесть рядом — молча',      a:sc_sit_rabi},
+        {t:'Присмотреться: что за блокнот?',      a:sc_spy_nb},
+        {t:'Уйти — лучше не связываться сейчас', a:sc_free_time},
+      ]);
+    },400);
+  },700);
+}
+
+function sc_sit_rabi() {
+  clrChoices();
+  player(`<em>(подходишь и садишься рядом на скамейку — молча)</em>`);
+  setTimeout(()=>{
+    npc('🦇','Раби',C.rabi,
+      `♀ Резко закрывает блокнот. Смотрит настороженно. Молчит. Потом, медленно: — <em>Чего тебе?</em> Не грубо. Почти настоящий вопрос.`);
+    setTimeout(()=>{
+      narr(`Вы сидите рядом. Лампа-солнце греет. Из Игрового Дома доносится шум. Раби не уходит.`);
+      updateRel(6);
+      setTimeout(()=>{
+        setChoices([
+          {t:'— Ничего. Просто тут хорошо.',        a:sc_rabi_small},
+          {t:'— Интересный у тебя блокнот.',         a:sc_nb_mention},
+        ]);
+      },400);
+    },500);
+  },400);
+}
+
+function sc_rabi_small() {
+  clrChoices();
+  player(`— Ничего. Просто тут хорошо.`);
+  setTimeout(()=>{
+    npc('🦇','Раби',C.rabi,
+      `♀ Фыркает — но без злости. — <em>Ты странный(-ая).</em> Молчание. Потом, почти неслышно: — <em>...Да. Тут нормально.</em>`);
+    updateRel(7); updateTokens(1);
+    setTimeout(()=>sc_free_time(), 600);
+  },400);
+}
+
+function sc_spy_nb() {
+  clrChoices();
+  player(`<em>(остаёшься в тени — наблюдаешь, не приближаясь)</em>`);
+  setTimeout(()=>{
+    narr(`Ты видишь: страницы плотно заполнены — схемы, имена, что-то похожее на расписание. И фотография. Кто-то из Кошмарных Зверят делает то, чего явно не должен делать в Playcare. Раби это <em>знает</em>. И хранит.<br><br><strong style="color:var(--accent2,#f472b6)">Ты запоминаешь.</strong>`);
+    G.phase = 'docs_found';
+    notif('📓 Ты видел(-а) блокнот Раби...');
+    setTimeout(()=>sc_free_time(), 700);
+  },500);
+}
+
+function sc_nb_mention() {
+  clrChoices();
+  player(`— Интересный у тебя блокнот.`);
+  setTimeout(()=>{
+    npc('🦇','Раби',C.rabi,
+      `♀ Резко поворачивается. Белые зрачки расширяются. — <em>Откуда ты зна... ты не видел(-а) ничего.</em> Голос ровный, но пальцы сжимают блокнот до хруста. — <strong>Ничего.</strong>`);
+    G.phase = 'docs_found';
+    notif('📓 Раби взволнована. Ты что-то знаешь.');
+    updateRel(5);
+    setTimeout(()=>sc_free_time(), 700);
+  },500);
+}
+
+/* ── Свободное время / магазин ── */
+function sc_free_time() {
+  clrChoices();
+  G.scene = 4;
+  if (G.phase === 'docs_found') {
+    setTimeout(()=>sc_docs_confrontation(), 800);
+    return;
+  }
+  narr(`День идёт своим чередом. <em>Раби продолжает шептаться.</em> Но иногда ты замечаешь: она смотрит на тебя чуть дольше, чем нужно сплетнице.`);
+  setTimeout(()=>{
+    setChoices([
+      {t:'Заглянуть в Магазин — посмотреть на подарки', a:sc_shop},
+      {t:'Подождать: что-то скоро произойдёт',           a:()=>{clrChoices();sc_docs_confrontation();}},
+    ]);
+  },400);
+}
+
+function sc_shop() {
+  clrChoices();
+  npc('🤖','Буги-бот','#86efac',
+    `Маленький робот на гусеницах выкатывается из-за прилавка. — <em>Привет-привет, ${G.name}! У нас сегодня:</em> 🎀 <strong>Красивая заколка</strong> (5🪙), 🍬 <strong>Пакет сладкого</strong> (2🪙), 📚 <strong>Книга</strong> (3🪙). Всё для тебя!`);
+  setTimeout(()=>{
+    const opts = [];
+    if (G.tokens >= 2) opts.push({t:`Купить сладкое для Раби (2🪙)`,  a:()=>sc_buy('candy')});
+    if (G.tokens >= 5) opts.push({t:`Купить заколку для Раби (5🪙)`,  a:()=>sc_buy('clip')});
+    opts.push({t:'Не сейчас — вернуться к истории', a:sc_docs_confrontation});
+    setChoices(opts);
+  },400);
+}
+
+function sc_buy(type) {
+  clrChoices();
+  const cost = type==='candy'?2:5;
+  const item = type==='candy'?'пакет сладкого':'красивую заколку';
+  G.tokens -= cost;
+  document.getElementById('bar-tokens').textContent = '🪙 '+G.tokens;
+  player(`<em>(покупаешь ${item} — для Раби)</em>`);
+  updateRel(type==='candy'?8:14);
+  notif(`Подарок куплен! 🎁`);
+  setTimeout(()=>sc_docs_confrontation(), 700);
+}
+
+/* ── Конфронтация с дневником ── */
+function sc_docs_confrontation() {
+  clrChoices();
+  G.scene = 5; G.phase = 'choice';
+  narr(`Вечер. Тихий коридор. Раби почти сталкивается с тобой за углом — вздрагивает. В руках блокнот. Из него на пол выпадает страница. Ты успеваешь поднять её первым(-ой).<br><br><em>Фото. Имена. Схема. Это не должно было существовать.</em>`);
+  setTimeout(()=>{
+    npc('🦇','Раби',C.rabi,
+      `♀ — Отдай. — Голос тихий, но в нём — что-то настоящее. Не злость. <em>Страх.</em> — Пожалуйста. — Последнее слово даётся ей с трудом.`);
+    setTimeout(()=>{
+      document.getElementById('modal-docs').classList.add('open');
+    },500);
+  },700);
+}
+
+function chooseBetrayal() {
+  document.getElementById('modal-docs').classList.remove('open');
+  G.betrayed = true; G.phase = 'betrayal';
+  player(`— Мне нужно поговорить с Мамочкой Лонг Ленг.`);
+  setTimeout(()=>{
+    npc('🦇','Раби',C.rabi,
+      `♀ Застывает. Розовые крылья сжимаются. — <em>Нет... нет-нет-нет...</em> Пятится. В её глазах — настоящий ужас. <strong>Не маска. Не игра.</strong>`);
+    setTimeout(()=>{
+      npc('👩','Мамочка Лонг Ленг',C.mama,
+        `♀ Мамочка появляется в конце коридора — будто почувствовала. Ты протягиваешь страницу. Она читает. Её лицо меняется медленно, страшно.<br>— <em>Раби... в мой кабинет. Сейчас.</em><br><br>Раби проходит мимо тебя, не поднимая взгляда. Её кулон-капля дрожит.`);
+      setTimeout(()=>{
+        narr(`Раби проводят к Папочке Лонг Ленгу. Через час становится известно: <strong>неделя в подвале</strong>. Коридоры затихают. Саймон ♂ смотрит в твою сторону — долго, без улыбки.`);
+        setTimeout(()=>{
+          setChoices([
+            {t:'Это был правильный поступок... наверное', a:sc_aftermath},
+            {t:'Жаль. Но у неё не было выбора',           a:sc_aftermath},
+          ]);
+        },500);
+      },800);
+    },600);
+  },500);
+}
+
+function chooseMercy() {
+  document.getElementById('modal-docs').classList.remove('open');
+  G.betrayed = false; G.phase = 'friends';
+  player(`<em>(смотришь на страницу — и возвращаешь её Раби)</em> — Это твоё.`);
+  setTimeout(()=>{
+    npc('🦇','Раби',C.rabi,
+      `♀ Берёт страницу дрожащими пальцами. Молчит. Долго. Потом поднимает взгляд — и впервые ты видишь её <em>без маски</em>.<br><br>— <strong>...Почему?</strong>`);
+    setTimeout(()=>{
+      player(`— Потому что это не моё дело.`);
+      setTimeout(()=>{
+        npc('🦇','Раби',C.rabi,
+          `♀ Хмыкает — но это не насмешка. Что-то совсем другое. — <em>Ты идиот(-ка).</em> Пауза. — <em>...Спасибо.</em><br><br>Уходит быстро — но у поворота оглядывается. Один раз.`);
+        updateRel(25); updateTokens(3);
+        notif('💗 Раби запомнила это. +25 к отношениям');
+        setTimeout(()=>sc_aftermath(), 700);
+      },500);
+    },500);
+  },500);
+}
+
+/* ── Последствия ── */
+function sc_aftermath() {
+  clrChoices();
+  G.scene = 6;
+  narr(`Дни идут. Playcare живёт своим ритмом. <em>Но что-то изменилось.</em>`);
+  setTimeout(()=>{
+    if (G.betrayed) {
+      narr(`Когда Раби ♀ вернулась из подвала — она не смотрит на тебя. Совсем. Саймон ♂ и Кошмарные Зверята обходят тебя стороной. <em>Ты ${P.verb('сделал')} выбор. Придётся жить с ним.</em>`);
+    } else {
+      npc('🦇','Раби',C.rabi,
+        `♀ Раби больше не шепчет про тебя гадостей. На следующий день — молча ставит на твой поднос что-то сладкое и отворачивается прежде, чем ты успеваешь сказать спасибо. Это её язык. <em>Ты учишься его понимать.</em>`);
+    }
+    setTimeout(()=>{
+      narr(`<strong style="color:var(--accent)">История только начинается.</strong> В Playcare 16 игрушек — каждая целый мир. Два клана, тайны, правила Папочки и лампа-солнце, которая всегда гаснет.`);
+      setTimeout(()=>{
+        setChoices([
+          {t:'Что сегодня в Игровом Доме?',           a:sc_continue},
+          {t:'Найти Раби и поговорить снова',          a:sc_continue},
+          {t:'Заглянуть в магазин за подарком',        a:sc_shop_end},
+        ]);
+      },400);
+    },700);
+  },600);
+}
+
+function sc_shop_end() {
+  clrChoices();
+  npc('🤖','Буги-бот','#86efac',
+    `— ${G.name}! Снова ты! У нас свежие поступления. Выбирай!`);
+  setTimeout(()=>{
+    const opts = [];
+    if (G.tokens >= 2) opts.push({t:`Купить сладкое (2🪙)`, a:()=>{G.tokens-=2;document.getElementById('bar-tokens').textContent='🪙 '+G.tokens;updateRel(6);notif('🍬 Раби будет рада');sc_continue();}});
+    if (G.tokens >= 5) opts.push({t:`Купить заколку (5🪙)`, a:()=>{G.tokens-=5;document.getElementById('bar-tokens').textContent='🪙 '+G.tokens;updateRel(12);notif('🎀 Красивый подарок!');sc_continue();}});
+    opts.push({t:'Ничего не нужно сейчас', a:sc_continue});
+    setChoices(opts);
+  },400);
+}
+
+function sc_continue() {
+  clrChoices();
+  narr(`<em>...Лампа-солнце мигает. Playcare ждёт.</em><br><br>
+    <strong style="color:var(--accent);font-size:1.05rem">— ПРОДОЛЖЕНИЕ СЛЕДУЕТ —</strong><br><br>
+    <span style="color:var(--dim);font-size:.83rem">Версия 1.1 · Следующее обновление: свободное перемещение, арка Саймона, все 16 персонажей</span>`);
+  setTimeout(()=>{
+    setChoices([
+      {t:'🔄 Начать заново (новый персонаж)', a:()=>{goTo('s-title');}},
+    ]);
+  },400);
+}
+
+function sendTxt() {
+  const inp = document.getElementById('player-txt');
+  const v = inp.value.trim();
+  if (!v) return;
+  inp.value = '';
+  player(v);
+}
+</script>
+</body>
+</html>
