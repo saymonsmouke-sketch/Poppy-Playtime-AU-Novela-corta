@@ -3,942 +3,1399 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PLAYCARE — Живые Игрушки</title>
+<title>🎪 Playcare — Живые Игрушки</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&family=Creepster&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-:root {
-  --bg:       #0c0a13;
-  --surf:     #141020;
-  --surf2:    #1c1630;
-  --border:   #2a1e45;
-  --text:     #e8dff5;
-  --dim:      #7a6a99;
-  --accent:   #b57bee;
-  --pink:     #f472b6;
-  --red:      #e05252;
-  --green:    #5ecc8a;
-  --gold:     #f5b642;
-  --glow:     0 0 22px rgba(181,123,238,.35);
-}
+  :root {
+    --bg:        #0e0720;
+    --bg2:       #1a0e35;
+    --bg3:       #251548;
+    --card:      #1f1040;
+    --border:    #3d246b;
+    --accent:    #7c3aed;
+    --accent2:   #c084fc;
+    --accent3:   #f0abfc;
+    --text:      #f0e4ff;
+    --text2:     #c4a8e8;
+    --text3:     #8b6aaa;
+    --good:      #34d399;
+    --neutral:   #fbbf24;
+    --evil:      #f87171;
+    --bar-h:     56px;
+    --hub-h:     80px;
+  }
 
-*{box-sizing:border-box;margin:0;padding:0;}
-html,body{min-height:100vh;}
-body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:'Nunito',sans-serif;
-  display:flex;flex-direction:column;align-items:center;
-}
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow: hidden;
+  }
 
-/* ── SCREENS ── */
-.screen{display:none;width:100%;max-width:660px;padding:0 16px 56px;}
-.screen.active{display:flex;flex-direction:column;}
+  /* ── SCREENS ── */
+  .screen { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+  .screen.active { display: flex; }
 
-/* ════════════════ TITLE ════════════════ */
-#s-title{
-  align-items:center;justify-content:center;
-  min-height:100vh;text-align:center;gap:0;
-}
-.lamp-anim{font-size:3.2rem;animation:lamp 3s ease-in-out infinite;margin-bottom:28px;}
-@keyframes lamp{0%,100%{filter:brightness(1);}50%{filter:brightness(1.7) drop-shadow(0 0 18px #f5b642);}}
-.title-logo{
-  font-family:'Creepster',cursive;
-  font-size:clamp(3rem,11vw,5.2rem);
-  color:var(--accent);
-  text-shadow:0 0 40px rgba(181,123,238,.7),0 0 90px rgba(181,123,238,.25);
-  letter-spacing:.12em;line-height:1;margin-bottom:6px;
-}
-.title-tag{font-size:.78rem;letter-spacing:.28em;color:var(--dim);text-transform:uppercase;margin-bottom:44px;}
-.intro-card{
-  background:linear-gradient(135deg,rgba(181,123,238,.1),rgba(244,114,182,.07));
-  border:1px solid rgba(181,123,238,.25);border-radius:18px;
-  padding:22px 20px;max-width:400px;margin-bottom:40px;
-}
-.intro-card p{font-size:.88rem;line-height:1.7;color:var(--dim);}
-.intro-card strong{color:var(--text);}
+  /* ─────────────────── TITLE SCREEN ─────────────────── */
+  #screen-title {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at 50% 30%, #2d0f5c 0%, #0e0720 70%);
+    gap: 12px;
+    padding: 40px 20px;
+  }
 
-/* ════════════════ CREATE ════════════════ */
-#s-create{padding-top:36px;gap:22px;}
-.create-head{margin-bottom:4px;}
-.create-title{font-family:'Creepster',cursive;font-size:1.9rem;color:var(--accent);letter-spacing:.07em;}
-.create-sub{font-size:.8rem;color:var(--dim);margin-top:4px;}
+  .title-glow {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.4rem, 8vw, 4rem);
+    font-weight: 700;
+    color: var(--accent3);
+    text-shadow: 0 0 40px #c084fc88, 0 0 80px #7c3aed44;
+    letter-spacing: 0.04em;
+    text-align: center;
+    line-height: 1.1;
+  }
+  .title-sub {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--text3);
+    font-size: 1rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .title-emoji { font-size: 3rem; margin-bottom: 8px; filter: drop-shadow(0 0 16px #c084fc); }
+  .title-rule { width: 180px; height: 1px; background: linear-gradient(90deg,transparent,var(--border),transparent); margin: 16px 0; }
 
-.field-lbl{font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:7px;}
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 32px; border-radius: 50px; border: none; cursor: pointer;
+    font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 700;
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+    outline: none;
+  }
+  .btn:active { transform: scale(0.96); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #5b21b6);
+    color: #fff;
+    box-shadow: 0 4px 24px #7c3aed66;
+  }
+  .btn-primary:hover { box-shadow: 0 6px 32px #7c3aedaa; transform: translateY(-1px); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--text2);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { border-color: var(--accent2); color: var(--accent3); }
+  .btn-sm { padding: 8px 20px; font-size: 0.88rem; }
+  .btn-danger { background: linear-gradient(135deg,#7f1d1d,#dc2626); color:#fff; }
 
-input[type=text]{
-  width:100%;background:var(--surf2);border:1px solid var(--border);
-  border-radius:11px;padding:12px 15px;color:var(--text);
-  font-family:'Nunito',sans-serif;font-size:.97rem;outline:none;
-  transition:border-color .2s,box-shadow .2s;
-}
-input[type=text]:focus{border-color:var(--accent);box-shadow:var(--glow);}
-input[type=text]::placeholder{color:var(--dim);}
+  /* ─────────────────── CHARACTER CREATION ─────────────────── */
+  #screen-create {
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto;
+    padding: 40px 20px 60px;
+    background: radial-gradient(ellipse at 50% 0%, #2d0f5c44 0%, transparent 60%), var(--bg);
+  }
 
-/* emoji picker */
-.emoji-section{display:flex;flex-direction:column;gap:8px;}
-.emoji-selected{
-  width:62px;height:62px;border-radius:14px;
-  background:var(--surf2);border:2px solid var(--accent);
-  display:flex;align-items:center;justify-content:center;
-  font-size:2rem;cursor:pointer;transition:transform .15s;
-  user-select:none;
-}
-.emoji-selected:hover{transform:scale(1.07);}
-.emoji-grid-wrap{
-  background:var(--surf2);border:1px solid var(--border);
-  border-radius:14px;padding:12px;
-  display:none;
-}
-.emoji-grid-wrap.open{display:block;}
-.emoji-cats{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
-.emoji-cat-btn{
-  background:var(--surf);border:1px solid var(--border);border-radius:8px;
-  padding:4px 10px;font-size:.72rem;color:var(--dim);cursor:pointer;
-  font-family:'Nunito',sans-serif;transition:all .15s;
-}
-.emoji-cat-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(181,123,238,.1);}
-.emoji-options{display:flex;flex-wrap:wrap;gap:6px;}
-.emoji-opt{
-  width:38px;height:38px;border-radius:9px;background:var(--surf);
-  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
-  font-size:1.4rem;cursor:pointer;transition:all .15s;
-}
-.emoji-opt:hover{border-color:var(--accent);transform:scale(1.12);}
+  .create-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: var(--accent3);
+    margin-bottom: 6px;
+    text-align: center;
+  }
+  .create-subtitle { color: var(--text3); font-size: 0.9rem; margin-bottom: 28px; text-align: center; }
 
-/* gender tabs */
-.gender-tabs{display:flex;gap:8px;}
-.g-btn{
-  flex:1;padding:10px 6px;border-radius:11px;
-  border:1px solid var(--border);background:var(--surf);
-  color:var(--dim);font-family:'Nunito',sans-serif;font-size:.83rem;
-  font-weight:700;cursor:pointer;transition:all .18s;
-}
-.g-btn.sel-m{border-color:#60a5fa;color:#60a5fa;background:rgba(96,165,250,.09);}
-.g-btn.sel-f{border-color:var(--pink);color:var(--pink);background:rgba(244,114,182,.09);}
-.g-btn.sel-n{border-color:var(--green);color:var(--green);background:rgba(94,204,138,.09);}
+  .create-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    width: 100%; max-width: 460px;
+    display: flex; flex-direction: column; gap: 20px;
+  }
 
-/* main button */
-.btn-main{
-  background:linear-gradient(135deg,var(--accent),var(--pink));
-  border:none;border-radius:13px;padding:14px 28px;
-  color:#fff;font-family:'Nunito',sans-serif;font-size:1rem;
-  font-weight:900;cursor:pointer;letter-spacing:.05em;
-  transition:all .2s;box-shadow:0 4px 22px rgba(181,123,238,.4);width:100%;
-}
-.btn-main:hover{transform:translateY(-2px);box-shadow:0 7px 30px rgba(181,123,238,.55);}
-.btn-main:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none;}
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-label { font-size: 0.82rem; font-weight: 700; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; }
 
-/* ════════════════ GAME ════════════════ */
-#s-game{padding-top:0;gap:0;}
+  .form-input {
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 12px;
+    padding: 10px 14px; color: var(--text); font-family: 'Nunito', sans-serif; font-size: 1rem;
+    outline: none; transition: border-color 0.2s;
+  }
+  .form-input:focus { border-color: var(--accent2); }
 
-.top-bar{
-  position:sticky;top:0;z-index:20;
-  background:rgba(12,10,19,.92);backdrop-filter:blur(10px);
-  border-bottom:1px solid var(--border);
-  padding:9px 16px;display:flex;justify-content:space-between;align-items:center;
-  width:100%;max-width:660px;
-}
-.player-chip{
-  display:flex;align-items:center;gap:9px;
-}
-.player-emo{font-size:1.5rem;line-height:1;}
-.player-info{display:flex;flex-direction:column;}
-.player-nm{font-size:.88rem;font-weight:900;color:var(--accent);}
-.player-sp{font-size:.68rem;color:var(--dim);}
+  .emoji-grid {
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px;
+  }
+  .emoji-btn {
+    aspect-ratio: 1; border-radius: 12px; border: 2px solid var(--border);
+    background: var(--bg3); font-size: 1.5rem; cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, transform 0.1s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .emoji-btn:hover { border-color: var(--accent2); background: var(--bg2); }
+  .emoji-btn.selected { border-color: var(--accent); background: #3b1d7a; box-shadow: 0 0 12px #7c3aed66; transform: scale(1.08); }
 
-.token-badge{
-  background:rgba(245,182,66,.13);border:1px solid rgba(245,182,66,.35);
-  border-radius:20px;padding:5px 13px;font-size:.8rem;font-weight:700;color:var(--gold);
-}
+  .gender-row { display: flex; gap: 10px; }
+  .gender-btn {
+    flex: 1; padding: 10px; border-radius: 12px; border: 2px solid var(--border);
+    background: var(--bg3); color: var(--text2); font-family: 'Nunito',sans-serif;
+    font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.15s;
+  }
+  .gender-btn.selected { border-color: var(--accent); background: #3b1d7a; color: var(--accent3); }
 
-/* relation bar */
-#rel-panel{display:none;padding:10px 16px 0;}
-.rel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
-.rel-who{font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);}
-.rel-pct{font-size:.7rem;font-weight:900;color:var(--accent);}
-.rel-bg{height:5px;background:var(--surf2);border-radius:99px;overflow:hidden;}
-.rel-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--pink),var(--accent));transition:width .7s cubic-bezier(.4,0,.2,1);}
-.rel-stage{font-size:.68rem;color:var(--accent);font-weight:700;margin-top:4px;text-align:right;}
+  .preview-toy {
+    text-align: center; padding: 16px; background: var(--bg2); border-radius: 14px;
+    border: 1px dashed var(--border);
+  }
+  .preview-emoji { font-size: 3.5rem; display: block; margin-bottom: 6px; filter: drop-shadow(0 0 10px #c084fc66); }
+  .preview-name { font-weight: 800; font-size: 1.1rem; color: var(--accent3); }
+  .preview-meta { color: var(--text3); font-size: 0.85rem; margin-top: 2px; }
 
-/* story */
-.story-wrap{display:flex;flex-direction:column;gap:14px;padding:14px 0;}
+  /* ─────────────────── GAME SCREEN ─────────────────── */
+  #screen-game {
+    flex-direction: column;
+    background: var(--bg);
+  }
 
-.s-block{
-  background:var(--surf);border:1px solid var(--border);
-  border-radius:15px;padding:16px 15px;
-  animation:fade .4s ease;
-}
-@keyframes fade{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:none;}}
-.s-player{background:rgba(181,123,238,.07);border-color:rgba(181,123,238,.22);}
-.s-narrator{background:rgba(255,255,255,.025);border-color:rgba(255,255,255,.06);}
+  /* TOP BAR */
+  #topbar {
+    height: var(--bar-h);
+    min-height: var(--bar-h);
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center;
+    padding: 0 16px; gap: 12px;
+    z-index: 20;
+    flex-shrink: 0;
+  }
+  #topbar-player {
+    display: flex; align-items: center; gap: 8px; flex: 1;
+  }
+  #topbar-emoji { font-size: 1.6rem; line-height: 1; }
+  #topbar-name { font-weight: 800; font-size: 0.95rem; color: var(--accent3); }
+  #topbar-kind { color: var(--text3); font-size: 0.78rem; }
+  #topbar-rating {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 20px; padding: 4px 12px;
+    font-size: 0.85rem; font-weight: 700;
+  }
+  #topbar-save-btn {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 10px; width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 1.1rem; transition: border-color 0.15s;
+  }
+  #topbar-save-btn:hover { border-color: var(--accent2); }
 
-.npc-row{display:flex;align-items:center;gap:8px;margin-bottom:9px;}
-.npc-emo{font-size:1.35rem;line-height:1;}
-.npc-nm{font-size:.72rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;}
+  /* RELATION BAR */
+  #relation-bar {
+    padding: 10px 16px 8px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    display: none;
+    flex-shrink: 0;
+  }
+  #relation-bar.visible { display: block; }
+  .rel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .rel-name { font-weight: 700; font-size: 0.9rem; color: var(--accent3); }
+  .rel-pct { font-size: 0.85rem; font-weight: 700; color: var(--text2); }
+  .rel-track { height: 8px; background: var(--bg3); border-radius: 99px; overflow: hidden; }
+  .rel-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 99px; transition: width 0.5s ease; }
+  .rel-status { font-size: 0.75rem; color: var(--text3); margin-top: 4px; }
 
-.s-text{font-size:.93rem;line-height:1.72;color:var(--text);}
-.s-text em{color:var(--dim);font-style:italic;}
+  /* FEED */
+  #feed-wrap {
+    flex: 1; overflow-y: auto; padding: 16px 12px;
+    display: flex; flex-direction: column; gap: 14px;
+    scroll-behavior: smooth;
+  }
 
-/* choices */
-.choices-wrap{display:flex;flex-direction:column;gap:7px;padding:6px 0 4px;animation:fade .45s ease;}
-.ch-btn{
-  background:var(--surf);border:1px solid var(--border);border-radius:12px;
-  padding:13px 15px;color:var(--text);font-family:'Nunito',sans-serif;
-  font-size:.9rem;font-weight:700;cursor:pointer;text-align:left;
-  display:flex;align-items:center;gap:10px;transition:all .18s;
-}
-.ch-btn:hover{border-color:var(--accent);background:rgba(181,123,238,.09);transform:translateX(4px);}
-.ch-num{
-  background:var(--surf2);border-radius:7px;padding:2px 8px;
-  font-size:.72rem;color:var(--accent);font-weight:900;flex-shrink:0;
-}
+  /* POST CARD */
+  .post {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 18px;
+    animation: fadeUp 0.35s ease both;
+    max-width: 600px; width: 100%;
+    align-self: flex-start;
+  }
+  .post.post-player { align-self: flex-end; background: #1e1050; border-color: #5b3fa0; }
+  .post.post-narrator { background: transparent; border-color: transparent; padding: 4px 4px; }
 
-/* notif */
-.notif{
-  position:fixed;bottom:22px;left:50%;
-  transform:translateX(-50%) translateY(55px);opacity:0;
-  background:var(--surf2);border:1px solid var(--accent);border-radius:12px;
-  padding:9px 20px;font-size:.83rem;font-weight:700;color:var(--accent);
-  transition:transform .3s cubic-bezier(.4,0,.2,1),opacity .3s;
-  z-index:100;white-space:nowrap;
-}
-.notif.show{transform:translateX(-50%) translateY(0);opacity:1;}
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
-/* modal */
-.modal-ov{
-  display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.72);z-index:200;
-  align-items:center;justify-content:center;padding:16px;
-}
-.modal-ov.open{display:flex;}
-.modal-box{
-  background:var(--surf);border:1px solid var(--border);
-  border-radius:20px;padding:28px 22px;max-width:400px;width:100%;
-  animation:fade .3s ease;
-}
-.modal-ttl{font-size:1.1rem;font-weight:900;color:var(--pink);margin-bottom:11px;}
-.modal-txt{font-size:.88rem;line-height:1.65;color:var(--text);margin-bottom:20px;}
-.modal-btns{display:flex;gap:9px;}
-.modal-btns button{flex:1;border-radius:11px;padding:12px;font-family:'Nunito',sans-serif;font-weight:900;font-size:.88rem;cursor:pointer;border:none;transition:opacity .2s;}
-.btn-red{background:linear-gradient(135deg,#e05252,#b83232);color:#fff;}
-.btn-red:hover{opacity:.85;}
-.btn-mercy{background:var(--surf2);border:1px solid var(--accent)!important;border-style:solid;color:var(--accent);}
-.btn-mercy:hover{background:rgba(181,123,238,.1);}
+  .post-header {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+  }
+  .post-avatar { font-size: 1.6rem; line-height: 1; }
+  .post-speaker { font-weight: 800; font-size: 0.95rem; }
+  .post-gender { color: var(--text3); font-size: 0.8rem; }
+  .post-body { display: flex; flex-direction: column; gap: 8px; }
+  .post-action { color: var(--text2); font-size: 0.93rem; font-style: normal; }
+  .post-action strong { color: var(--text); font-weight: 600; }
+  .post-dialog { color: var(--accent3); font-size: 0.97rem; font-style: italic; }
+  .post-dialog::before { content: '"'; }
+  .post-dialog::after  { content: '"'; }
+  .post-note { color: var(--text3); font-size: 0.82rem; font-style: italic; }
 
-/* divider */
-.divider{height:1px;background:var(--border);margin:2px 0;}
+  .location-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 4px 12px;
+    font-size: 0.78rem; color: var(--text3);
+    align-self: center; margin: 4px 0;
+    letter-spacing: 0.05em;
+  }
 
-/* player input */
-.input-row{display:none;gap:8px;padding:10px 0 2px;}
-.input-row input{flex:1;padding:11px 14px;font-size:.88rem;}
-.send-btn{
-  background:var(--surf2);border:1px solid var(--border);border-radius:10px;
-  padding:11px 15px;color:var(--accent);font-size:1.1rem;cursor:pointer;
-  transition:all .18s;flex-shrink:0;
-}
-.send-btn:hover{border-color:var(--accent);background:rgba(181,123,238,.12);}
+  /* CHOICES */
+  #choices-wrap {
+    padding: 12px 12px;
+    display: flex; flex-direction: column; gap: 8px;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  #choices-wrap.hidden { display: none; }
+
+  .choice-btn {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 14px; padding: 12px 16px;
+    color: var(--text); font-family: 'Nunito', sans-serif; font-size: 0.92rem;
+    cursor: pointer; text-align: left; transition: all 0.15s;
+    font-weight: 600; line-height: 1.4;
+  }
+  .choice-btn:hover { border-color: var(--accent); background: #251548; color: var(--accent3); }
+  .choice-btn:active { transform: scale(0.98); }
+  .choice-btn.next-btn {
+    text-align: center; color: var(--text3); font-weight: 700; font-size: 0.85rem;
+    border-style: dashed;
+  }
+
+  /* HUB */
+  #hub {
+    height: var(--hub-h);
+    min-height: var(--hub-h);
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    display: none;
+    align-items: center;
+    overflow-x: auto;
+    padding: 0 12px;
+    gap: 8px;
+    flex-shrink: 0;
+    z-index: 10;
+    scrollbar-width: none;
+  }
+  #hub::-webkit-scrollbar { display: none; }
+  #hub.visible { display: flex; }
+
+  .hub-btn {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 3px; min-width: 60px; padding: 6px 8px; border-radius: 14px;
+    border: 1px solid transparent; background: transparent;
+    cursor: pointer; transition: all 0.15s; flex-shrink: 0;
+  }
+  .hub-btn:hover { background: var(--bg3); border-color: var(--border); }
+  .hub-btn.active-loc { background: #2a1060; border-color: var(--accent); }
+  .hub-icon { font-size: 1.5rem; line-height: 1; }
+  .hub-label { font-size: 0.62rem; font-weight: 700; color: var(--text3); text-align: center; white-space: nowrap; letter-spacing: 0.03em; }
+
+  /* ─────────────────── SAVE MODAL ─────────────────── */
+  #save-modal {
+    display: none; position: fixed; inset: 0; z-index: 100;
+    background: #000000bb; align-items: center; justify-content: center;
+  }
+  #save-modal.open { display: flex; }
+  .modal-box {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 28px; width: 340px; max-width: 95vw;
+  }
+  .modal-title { font-size: 1.1rem; font-weight: 800; color: var(--accent3); margin-bottom: 16px; }
+  .save-slots { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+  .save-slot {
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 12px;
+    padding: 12px 14px; cursor: pointer; transition: border-color 0.15s;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .save-slot:hover { border-color: var(--accent2); }
+  .save-slot-info { font-size: 0.88rem; color: var(--text2); }
+  .save-slot-time { font-size: 0.75rem; color: var(--text3); }
+  .modal-close { width: 100%; }
+
+  /* ─────────────────── MISC ─────────────────── */
+  .rating-good   { color: var(--good); }
+  .rating-neutral{ color: var(--neutral); }
+  .rating-evil   { color: var(--evil); }
+
+  .fade-in { animation: fadeUp 0.4s ease both; }
+
+  /* mobile safe-area bottom padding for choices */
+  @supports (padding-bottom: env(safe-area-inset-bottom)) {
+    #choices-wrap { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+    #hub           { padding-bottom: calc(6px  + env(safe-area-inset-bottom)); height: calc(var(--hub-h) + env(safe-area-inset-bottom)); }
+  }
 </style>
 </head>
 <body>
 
-<!-- ═══════════ TITLE ═══════════ -->
-<div id="s-title" class="screen active">
-  <div class="lamp-anim">💡</div>
-  <div class="title-logo">PLAYCARE</div>
-  <div class="title-tag">Живые Игрушки · Визуальная Новелла</div>
-  <div class="intro-card">
-    <p>Глубоко под землёй — огромный купол. Лампа-солнце. Живые игрушки.<br><br>
-    <strong>Мамочка Лонг Ленг нашла тебя в мусоропроводе и дала тебе дом.</strong><br><br>
-    Добро пожаловать в Playcare. Выхода нет. Но место для тебя — найдётся.</p>
-  </div>
-  <button class="btn-main" style="max-width:280px;" onclick="goTo('s-create')">▶ Начать историю</button>
+<!-- ═══════════════════ TITLE ═══════════════════ -->
+<div id="screen-title" class="screen active">
+  <span class="title-emoji">🎪</span>
+  <h1 class="title-glow">Playcare</h1>
+  <p class="title-sub">Живые Игрушки</p>
+  <div class="title-rule"></div>
+  <button class="btn btn-primary" onclick="showCreate()">▶ Начать игру</button>
+  <button class="btn btn-secondary" style="margin-top:8px" onclick="openSaveModal('load')">📂 Загрузить сохранение</button>
 </div>
 
-<!-- ═══════════ CREATE ═══════════ -->
-<div id="s-create" class="screen">
-  <div class="create-head">
-    <div class="create-title">Создай персонажа</div>
-    <div class="create-sub">Придумай свою игрушку — имя, вид, внешность</div>
-  </div>
+<!-- ═══════════════════ CHARACTER CREATION ═══════════════════ -->
+<div id="screen-create" class="screen">
+  <h2 class="create-title">Создай свою игрушку</h2>
+  <p class="create-subtitle">Ты — живая игрушка. Чёрные белки, молния-застёжка, своя история.</p>
 
-  <!-- EMOJI -->
-  <div class="emoji-section">
-    <div class="field-lbl">Иконка персонажа</div>
-    <div style="display:flex;align-items:center;gap:12px;">
-      <div class="emoji-selected" id="emo-preview" onclick="toggleEmojiGrid()">🐾</div>
-      <div style="font-size:.8rem;color:var(--dim);">Нажми, чтобы выбрать смайлик</div>
+  <div class="create-card">
+    <!-- preview -->
+    <div class="preview-toy">
+      <span class="preview-emoji" id="preview-emoji">🐾</span>
+      <div class="preview-name" id="preview-name">Имя не задано</div>
+      <div class="preview-meta" id="preview-meta">Вид не задан · —</div>
     </div>
-    <div class="emoji-grid-wrap" id="emo-grid">
-      <div class="emoji-cats" id="emo-cats"></div>
-      <div class="emoji-options" id="emo-opts"></div>
+
+    <!-- emoji -->
+    <div class="form-group">
+      <label class="form-label">Иконка</label>
+      <div class="emoji-grid" id="emoji-grid"></div>
     </div>
-  </div>
 
-  <!-- NAME -->
-  <div>
-    <div class="field-lbl">Имя персонажа</div>
-    <input type="text" id="inp-name" placeholder="Например: Ксави, Миро, Лира..." maxlength="24" oninput="validate()">
-  </div>
-
-  <!-- SPECIES -->
-  <div>
-    <div class="field-lbl">Вид животного</div>
-    <input type="text" id="inp-species" placeholder="Например: летучая мышь, лис, волк..." maxlength="32" oninput="validate()">
-  </div>
-
-  <!-- APPEARANCE -->
-  <div>
-    <div class="field-lbl">Цвет и внешность <span style="color:var(--dim);font-size:.65rem;">(необязательно)</span></div>
-    <input type="text" id="inp-look" placeholder="Например: серый, с синими пятнами..." maxlength="60">
-  </div>
-
-  <!-- GENDER -->
-  <div>
-    <div class="field-lbl">Пол / местоимения</div>
-    <div class="gender-tabs">
-      <button class="g-btn" id="g-m" onclick="setGender('m')">♂ Он</button>
-      <button class="g-btn" id="g-f" onclick="setGender('f')">♀ Она</button>
-      <button class="g-btn" id="g-n" onclick="setGender('n')">◈ Они</button>
+    <!-- name -->
+    <div class="form-group">
+      <label class="form-label">Имя</label>
+      <input class="form-input" id="char-name" type="text" maxlength="20" placeholder="Как тебя зовут?" oninput="updatePreview()">
     </div>
-  </div>
 
-  <button class="btn-main" id="btn-start" onclick="startGame()" disabled>Войти в Playcare →</button>
-</div>
+    <!-- species -->
+    <div class="form-group">
+      <label class="form-label">Вид</label>
+      <input class="form-input" id="char-kind" type="text" maxlength="30" placeholder="Кошка, пёс, лиса…" oninput="updatePreview()">
+    </div>
 
-<!-- ═══════════ GAME ═══════════ -->
-<div id="s-game" class="screen">
-  <div class="top-bar">
-    <div class="player-chip">
-      <div class="player-emo" id="bar-emo">🐾</div>
-      <div class="player-info">
-        <div class="player-nm" id="bar-name">???</div>
-        <div class="player-sp" id="bar-sp">???</div>
+    <!-- appearance (optional) -->
+    <div class="form-group">
+      <label class="form-label">Внешность <span style="font-weight:400;opacity:.6">(необязательно)</span></label>
+      <input class="form-input" id="char-look" type="text" maxlength="60" placeholder="Рыжий, пятнышко на ухе…">
+    </div>
+
+    <!-- gender -->
+    <div class="form-group">
+      <label class="form-label">Пол</label>
+      <div class="gender-row">
+        <button class="gender-btn" data-g="♂" onclick="selectGender(this)">♂ Он</button>
+        <button class="gender-btn" data-g="♀" onclick="selectGender(this)">♀ Она</button>
+        <button class="gender-btn" data-g="◈" onclick="selectGender(this)">◈ Своё</button>
       </div>
     </div>
-    <div class="token-badge" id="bar-tokens">🪙 0</div>
+
+    <button class="btn btn-primary" onclick="startGame()" style="width:100%">Войти в Playcare →</button>
+    <button class="btn btn-secondary btn-sm" onclick="goTo('title')" style="align-self:center">← Назад</button>
+  </div>
+</div>
+
+<!-- ═══════════════════ GAME ═══════════════════ -->
+<div id="screen-game" class="screen" style="flex-direction:column;">
+
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <div id="topbar-player">
+      <span id="topbar-emoji">🐾</span>
+      <div>
+        <div id="topbar-name">—</div>
+        <div id="topbar-kind">—</div>
+      </div>
+    </div>
+    <div id="topbar-rating"><span id="rating-icon">😐</span><span id="rating-label">Нейтральный</span></div>
+    <div id="topbar-save-btn" onclick="openSaveModal('save')" title="Сохранить">💾</div>
   </div>
 
-  <div id="rel-panel">
+  <!-- RELATION BAR -->
+  <div id="relation-bar">
     <div class="rel-header">
-      <span class="rel-who">🦇 Раби — Отношения</span>
+      <span class="rel-name" id="rel-name">—</span>
       <span class="rel-pct" id="rel-pct">0%</span>
     </div>
-    <div class="rel-bg"><div class="rel-fill" id="rel-fill" style="width:0%"></div></div>
-    <div class="rel-stage" id="rel-stage">Незнакомцы</div>
+    <div class="rel-track"><div class="rel-fill" id="rel-fill" style="width:0%"></div></div>
+    <div class="rel-status" id="rel-status">Незнакомцы</div>
   </div>
 
-  <div class="story-wrap" id="story-wrap"></div>
-  <div id="choices-wrap" class="choices-wrap" style="padding:0;"></div>
-  <div class="input-row" id="input-row">
-    <input type="text" id="player-txt" placeholder="Напиши что-то..." maxlength="200" onkeydown="if(event.key==='Enter')sendTxt()">
-    <button class="send-btn" onclick="sendTxt()">➤</button>
-  </div>
+  <!-- FEED -->
+  <div id="feed-wrap"></div>
+
+  <!-- CHOICES -->
+  <div id="choices-wrap" class="hidden"></div>
+
+  <!-- HUB -->
+  <div id="hub"></div>
 </div>
 
-<!-- DOCS MODAL -->
-<div class="modal-ov" id="modal-docs">
+<!-- ═══════════════════ SAVE MODAL ═══════════════════ -->
+<div id="save-modal">
   <div class="modal-box">
-    <div class="modal-ttl">📁 Секреты Раби</div>
-    <div class="modal-txt">
-      В твоих руках — документы, фотографии и личный дневник Раби.
-      Здесь всё: тайные связи с Кошмарными Зверятами, тёмные делишки,
-      и то, чего не должна знать <strong>Мамочка Лонг Ленг</strong>.<br><br>
-      Если это попадёт к ней — Раби отправят к <em>Папочке</em>. А потом — в подвал.
-    </div>
-    <div class="modal-btns">
-      <button class="btn-red" onclick="chooseBetrayal()">🗣️ Рассказать Мамочке</button>
-      <button class="btn-mercy" onclick="chooseMercy()">🤫 Промолчать</button>
-    </div>
+    <div class="modal-title" id="modal-title">Сохранить игру</div>
+    <div class="save-slots" id="save-slots"></div>
+    <button class="btn btn-secondary modal-close" onclick="closeSaveModal()">Закрыть</button>
   </div>
 </div>
-
-<div class="notif" id="notif"></div>
 
 <script>
-// ═══════════ EMOJI DATA ═══════════
-const EMOJI_CATS = {
-  '🐾 Зверята': ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐔','🐧','🐦','🦆','🦉','🦇','🐺','🐗','🐴','🦄','🐝','🦋','🐛','🐌','🐙','🦑','🦀','🐡','🐠','🐟','🐊','🐢','🦎','🐍','🦕','🦖','🦓','🦍','🦧','🦣','🐘','🦛','🦏','🐪','🐫','🦒','🦘','🦬','🐃','🐂','🐄','🐎','🐖','🐏','🐑','🦙','🐐','🦌','🐕','🐩','🦮','🐈','🐓','🦃','🦤','🦚','🦜','🦢','🕊','🐇','🦝','🦨','🦡','🦦','🦥','🐁','🐀','🦔'],
-  '✨ Фэнтези': ['🐲','🐉','🦄','👾','👻','💀','☠️','🎃','🧿','🔮','⚡','🌙','⭐','🌟','💫','✨','🌈','🌊','🔥','❄️','🌪','🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘'],
-  '💎 Символы': ['💜','💗','🖤','🩷','🩵','🩶','❤️','🧡','💛','💚','💙','🤍','🤎','💔','💕','💞','💓','💝','🩸','💀','⚰️','🪦','👁️','🌸','🌺','🌻','🌹','🌷'],
+'use strict';
+
+// ─────────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────────
+var G = {
+  player: { emoji:'🐾', name:'', kind:'', look:'', gender:'♂' },
+  rating: 0,           // -100..100; <-20=evil, >20=good
+  relations: {         // npc_id -> 0-100
+    mamochka: 0,
+    day: 0,
+    harley: 0,
+    yarnabu: 0,
+    rabi: 0,
+    daddy: 0
+  },
+  prologDone: false,
+  scene: null,         // current scene id
+  hubActive: false,
+  saveMode: null
 };
 
-let selEmoji = '🐾';
-let activeCat = Object.keys(EMOJI_CATS)[0];
+// ─────────────────────────────────────────────
+//  NPC DATA
+// ─────────────────────────────────────────────
+var NPC = {
+  mamochka: { emoji:'🌸', name:'Мамочка', gender:'♀', color:'#f9a8d4' },
+  day:      { emoji:'🐶', name:'Дэй',     gender:'♂', color:'#fdba74' },
+  harley:   { emoji:'📺', name:'Доктор Харли', gender:'—', color:'#94a3b8' },
+  yarnabu:  { emoji:'🦁', name:'Ярнаби',  gender:'♂', color:'#fde68a' },
+  rabi:     { emoji:'🦇', name:'Раби',    gender:'♀', color:'#c4b5fd' },
+  daddy:    { emoji:'🎩', name:'Папочка Лонг Ленг', gender:'♂', color:'#93c5fd' }
+};
 
+// ─────────────────────────────────────────────
+//  EMOJI PICKER OPTIONS
+// ─────────────────────────────────────────────
+var EMOJIS = ['🐶','🐱','🦊','🐸','🐺','🐻','🐼','🐨','🦁','🐯',
+              '🐰','🐷','🐮','🐧','🐦','🐸','🦄','🐉','🦅','🐑',
+              '🦈','🐘','🐊','🐀','🦇','🐥'];
+
+// ─────────────────────────────────────────────
+//  HUB LOCATIONS
+// ─────────────────────────────────────────────
+var LOCS = [
+  { id:'home',    icon:'🏠', label:'Дом Милый Дом' },
+  { id:'school',  icon:'🏫', label:'Школа' },
+  { id:'gamehouse',icon:'🎮',label:'Игровой Дом' },
+  { id:'shop',    icon:'🏪', label:'Магазин' },
+  { id:'park',    icon:'🌳', label:'Парк' },
+  { id:'library', icon:'📚', label:'Библиотека' },
+  { id:'office',  icon:'🏢', label:'Офис' },
+  { id:'door',    icon:'🚪', label:'Выход' },
+  { id:'myroom',  icon:'🛏️', label:'Моя комната' }
+];
+
+// ─────────────────────────────────────────────
+//  SCENE DATA  (Prologue scenes 1-8)
+// ─────────────────────────────────────────────
+// Each scene: { id, npcId(optional), posts[], choices[] }
+// post: { type:'npc'|'player'|'loc'|'narrator', npcId, lines: [{t:'action'|'dialog'|'note', text}] }
+// choice: { text, next(sceneId or fn), rep, relId, relDelta }
+
+function buildScenes() {
+  return {
+
+    // ── SCENE 1 ──────────────────────────────────────────────
+    s1: {
+      id:'s1', npcId:'mamochka',
+      posts:[
+        { type:'loc',  text:'📍 Коридор · Рядом с мусоропроводом' },
+        { type:'npc', npcId:'mamochka', lines:[
+          { t:'action', text:'Огромные розовые руки подхватывают тебя прямо у земли. Лицо, которое смотрит на тебя сверху — широкая улыбка, фиолетовые волосы, тёплые глаза.' },
+          { t:'dialog', text:'Ой-ой-ой... Бедняжка. Ты живой?' },
+          { t:'action', text:'Прижимает тебя к себе — бережно, как хрупкую вещь.' }
+        ]}
+      ],
+      choices:[{ text:'Продолжить →', next:'s2', rep:0 }]
+    },
+
+    // ── SCENE 2 ──────────────────────────────────────────────
+    s2: {
+      id:'s2', npcId:'mamochka',
+      posts:[
+        { type:'loc',  text:'📍 Ванная · Дом Милый Дом' },
+        { type:'npc', npcId:'mamochka', lines:[
+          { t:'action', text:'Тёплая вода, запах мыла. Мамочка аккуратно отмывает тебя, напевая что-то тихое. Потом вдруг замирает — замечает царапины и ссадины.' },
+          { t:'dialog', text:'Нет-нет-нет, это никуда не годится. Тебе нужен доктор Харли.' },
+          { t:'action', text:'Быстро заворачивает тебя в полотенце и зовёт в коридор:' },
+          { t:'dialog', text:'ДЭЙ! ДЭЙ, ИДИ СЮДА!' }
+        ]}
+      ],
+      choices:[{ text:'Продолжить →', next:'s3', rep:0 }]
+    },
+
+    // ── SCENE 3 ──────────────────────────────────────────────
+    s3: {
+      id:'s3', npcId:'day',
+      posts:[
+        { type:'loc',  text:'📍 Коридор · Дом Милый Дом' },
+        { type:'npc', npcId:'day', lines:[
+          { t:'action', text:'Из-за угла выбегает оранжевый пёс с красными ушами — широкая улыбка, хвост крутится.' },
+          { t:'dialog', text:'Ого! Кто это у нас? Мамочка сказала провести тебя к Харли? Легко! Пошли, пошли!' },
+          { t:'action', text:'Уже идёт вперёд, не дождавшись ответа.' }
+        ]}
+      ],
+      choices:[
+        { text:'🐾 Спросить Дэя про Playcare', next:'s3a', rep:0, relId:'day', relDelta:3 },
+        { text:'👀 Молчать и смотреть по сторонам', next:'s3b', rep:0 },
+        { text:'🏥 Спросить про доктора Харли', next:'s3c', rep:0, relId:'day', relDelta:2 }
+      ]
+    },
+    s3a: {
+      id:'s3a', npcId:'day',
+      posts:[
+        { type:'player', lines:[
+          { t:'dialog', text:'А что вообще такое Playcare?' }
+        ]},
+        { type:'npc', npcId:'day', lines:[
+          { t:'action', text:'Дэй чуть замедляет шаг — и расплывается в улыбке.' },
+          { t:'dialog', text:'О, это долгая история! Короткая версия: мы живём здесь, под землёй, в самом лучшем месте во вселенной. Ну, почти.' },
+          { t:'note', text:'Он бросает взгляд куда-то вверх. Там — лампа-солнце.' }
+        ]}
+      ],
+      choices:[{ text:'Продолжить →', next:'s4', rep:0 }]
+    },
+    s3b: {
+      id:'s3b', npcId:'day',
+      posts:[
+        { type:'narrator', lines:[
+          { t:'note', text:'Ты молча идёшь за ним. Коридоры широкие, стены тёплые. Пахнет чем-то сладким и старым.' }
+        ]}
+      ],
+      choices:[{ text:'Продолжить →', next:'s4', rep:0 }]
+    },
+    s3c: {
+      id:'s3c', npcId:'day',
+      posts:[
+        { type:'player', lines:[
+          { t:'dialog', text:'Доктор Харли — кто это?' }
+        ]},
+        { type:'npc', npcId:'day', lines:[
+          { t:'dialog', text:'Наш доктор! Немного странный, но лучший в Playcare. И вообще единственный.' },
+          { t:'action', text:'Хихикает.' }
+        ]}
+      ],
+      choices:[{ text:'Продолжить →', next:'s4', rep:0 }]
+    },
+
+    // ── SCENE 4 ──────────────────────────────────────────────
+    s4: {
+      id:'s4', npcId:'harley',
+      posts:[
+        { type:'loc',  text:'📍 Медицинский кабинет' },
+        { type:'npc', npcId:'harley', lines:[
+          { t:'action', text:'Холодные металлические руки осматривают тебя профессионально и быстро. Доктор молчит. На экране вместо головы — одинокий глаз в помехах.' },
+          { t:'dialog', text:'Ничего критического. Ушибы, ссадины. Перевязка.' },
+          { t:'action', text:'Ярнаби в углу наблюдает за тобой молча. Не угрожающе — просто смотрит.' }
+        ]}
+      ],
+      choices:[
+        { text:'🙏 Сказать спасибо доктору',     next:'s4a', rep:0, relId:'harley', relDelta:5 },
+        { text:'🦁 Попробовать заговорить с Ярнаби', next:'s4b', rep:0, relId:'yarnabu', relDelta:4 },
+        { text:'❓ Как долго лечиться?',           next:'s4c', rep:0 }
+      ]
+    },
+    s4a: {
+      id:'s4a', npcId:'harley',
+      posts:[
+        { type:'player', lines:[{ t:'dialog', text:'Спасибо, доктор.' }]},
+        { type:'npc', npcId:'harley', lines:[
+          { t:'action', text:'Пауза. Экран мигает.' },
+          { t:'dialog', text:'Не благодари. Моя работа.' }
+        ]}
+      ],
+      choices:[{ text:'Продолжить →', next:'s5', rep:0 }]
+    },
+    s4b: {
+      id:'s4b', npcId:'yarnabu',
+      posts:[
+        { type:'player', lines:[{ t:'dialog', text:'Привет...' }]},
+        { type:'npc', npcId:'yarnabu', lines:[
+          { t:'action', text:'Огромный лев с радужной гривой медленно поворачивает голову. Молчание. Потом — что-то похожее на кивок.' },
+          { t:'note', text:'Кажется, это его способ сказать «привет».' }
+        ]}
+      ],
+      choices:[{ text:'Продолжить →', next:'s5', rep:0 }]
+    },
+    s4c: {
+      id:'s4c', npcId:'harley',
+      posts:[
+        { type:'player', lines:[{ t:'dialog', text:'Сколько мне лечиться?' }]},
+        { type:'npc', npcId:'harley', lines:[
+          { t:'dialog', text:'Два дня. Не нагружай себя. Приходи на перевязку утром.' }
+        ]}
+      ],
+      choices:[{ text:'Продолжить →', next:'s5', rep:0 }]
+    },
+
+    // ── SCENE 5 ──────────────────────────────────────────────
+    s5: {
+      id:'s5', npcId:'day',
+      posts:[
+        { type:'loc',  text:'📍 Экскурсия по Playcare' },
+        { type:'npc', npcId:'day', lines:[
+          { t:'action', text:'Дэй нетерпеливо топчется у выхода из кабинета.' },
+          { t:'dialog', text:'Ну всё? Живой? Отлично! Я покажу тебе всё! Ну, основное. Пошли!' }
+        ]},
+        { type:'narrator', lines:[
+          { t:'note', text:'Раби что-то шепчет Саймону в конце коридора. Оба смотрят на тебя.' }
+        ]}
+      ],
+      choices:[
+        { text:'🎮 Сначала в Игровой Дом',  next:'s5a', rep:0, relId:'day', relDelta:2 },
+        { text:'🌳 Сначала в Парк',          next:'s5b', rep:0 },
+        { text:'🏪 Сначала в Магазин',       next:'s5c', rep:0, relId:'day', relDelta:2 }
+      ]
+    },
+    s5a: {
+      id:'s5a', npcId:'day',
+      posts:[
+        { type:'loc',  text:'📍 Игровой Дом' },
+        { type:'npc', npcId:'day', lines:[
+          { t:'action', text:'Огромный зал с бассейном, горками и сотнями цветных коробок.' },
+          { t:'dialog', text:'Вот! Бассейн, лабиринт, ну и конечно Бокси-Бу живёт—' }
+        ]},
+        { type:'narrator', lines:[
+          { t:'action', text:'ИЗ ОГРОМНОЙ КОРОБКИ ВЫРЫВАЕТСЯ ПЁСТРЫЙ ДЖЕК. Дэй хохочет.' },
+          { t:'note', text:'Бокси-Бу. Добрый. Просто очень резкий.' }
+        ]}
+      ],
+      choices:[{ text:'Продолжить экскурсию →', next:'s6', rep:0 }]
+    },
+    s5b: {
+      id:'s5b', npcId:'day',
+      posts:[
+        { type:'loc',  text:'📍 Парк' },
+        { type:'npc', npcId:'day', lines:[
+          { t:'action', text:'Странная тишина. Посреди парка — огромная статуя синей фигуры в цилиндре.' },
+          { t:'dialog', text:'Это Папочка. Ну, статуя. Настоящий — в офисе.' },
+          { t:'note', text:'Дэй говорит тихо здесь. Непривычно.' }
+        ]}
+      ],
+      choices:[{ text:'Продолжить экскурсию →', next:'s6', rep:0 }]
+    },
+    s5c: {
+      id:'s5c', npcId:'day',
+      posts:[
+        { type:'loc',  text:'📍 Магазин' },
+        { type:'npc', npcId:'day', lines:[
+          { t:'action', text:'На гусеницах из-за стойки выкатывается приветливый робот.' },
+          { t:'dialog', text:'Это Буги-бот. Продаёт всякое. Я у него обычно сладкое беру.' }
+        ]},
+        { type:'narrator', lines:[
+          { t:'note', text:'Буги-бот пищит мелодично. Кажется, рад новому покупателю.' }
+        ]}
+      ],
+      choices:[{ text:'Продолжить экскурсию →', next:'s6', rep:0 }]
+    },
+
+    // ── SCENE 6 ──────────────────────────────────────────────
+    s6: {
+      id:'s6', npcId:'rabi',
+      posts:[
+        { type:'loc',  text:'📍 Коридор' },
+        { type:'npc', npcId:'rabi', lines:[
+          { t:'action', text:'Белоснежная летучая мышь с розовыми крыльями стоит прямо посреди коридора. Кулон-капля крови покачивается на шее. Смотрит на тебя оценивающе — и усмехается.' },
+          { t:'dialog', text:'О. Новенький. Мусоропроводный подарочек.' },
+          { t:'action', text:'Кто-то рядом хихикает.' }
+        ]}
+      ],
+      choices:[
+        { text:'😶 Пройти мимо молча',                      next:'s6a', rep:0, relId:'rabi', relDelta:1 },
+        { text:'😌 «Это правда. И что?»',                   next:'s6b', rep:1, relId:'rabi', relDelta:5 },
+        { text:'😠 Нагрубить в ответ',                       next:'s6c', rep:-5, relId:'rabi', relDelta:8 }
+      ]
+    },
+    s6a: {
+      id:'s6a', npcId:'rabi',
+      posts:[
+        { type:'player', lines:[{ t:'action', text:'Ты проходишь мимо, не обращая внимания.' }]},
+        { type:'npc', npcId:'rabi', lines:[
+          { t:'note', text:'Раби смотрит вслед. Молча. Это хуже чем слова.' }
+        ]}
+      ],
+      choices:[{ text:'Продолжить →', next:'s7', rep:0 }]
+    },
+    s6b: {
+      id:'s6b', npcId:'rabi',
+      posts:[
+        { type:'player', lines:[{ t:'dialog', text:'Это правда. И что?' }]},
+        { type:'npc', npcId:'rabi', lines:[
+          { t:'action', text:'Раби на секунду замирает. Потом — лёгкая улыбка.' },
+          { t:'dialog', text:'Ничего. Просто смотрю.' }
+        ]},
+        { type:'narrator', lines:[
+          { t:'note', text:'Что-то в её взгляде изменилось.' }
+        ]}
+      ],
+      choices:[{ text:'Продолжить →', next:'s7', rep:0 }]
+    },
+    s6c: {
+      id:'s6c', npcId:'rabi',
+      posts:[
+        { type:'player', lines:[{ t:'dialog', text:'А твоё какое дело, летучая мышь?' }]},
+        { type:'npc', npcId:'rabi', lines:[
+          { t:'action', text:'Раби поднимает бровь. Смеётся — тихо, но не весело.' },
+          { t:'dialog', text:'О. Интересно.' }
+        ]},
+        { type:'narrator', lines:[
+          { t:'note', text:'Где-то в глубине коридора кто-то одобрительно присвистнул.' }
+        ]}
+      ],
+      choices:[{ text:'Продолжить →', next:'s7', rep:0 }]
+    },
+
+    // ── SCENE 7 ──────────────────────────────────────────────
+    s7: {
+      id:'s7', npcId:'daddy',
+      posts:[
+        { type:'loc',  text:'📍 Офис Консультаций' },
+        { type:'npc', npcId:'daddy', lines:[
+          { t:'action', text:'За огромным столом сидит синяя фигура в цилиндре. Длинные пальцы сцеплены. Улыбка — официальная. Он смотрит на тебя долго, прежде чем что-то сказать.' },
+          { t:'dialog', text:'Добро пожаловать в Playcare. У нас есть правила. Они просты. Их нарушение имеет последствия.' },
+          { t:'action', text:'Кладёт на стол карту — цветную, подробную.' },
+          { t:'dialog', text:'Это твой дом теперь. Веди себя соответственно.' }
+        ]}
+      ],
+      choices:[
+        { text:'🗺️ Взять карту и поблагодарить',      next:'s7a', rep:5,  relId:'daddy', relDelta:5 },
+        { text:'🚪 Спросить про Выходную Дверь',       next:'s7b', rep:0,  relId:'daddy', relDelta:-2 },
+        { text:'🚶 Промолчать и уйти',                 next:'s7c', rep:0 }
+      ]
+    },
+    s7a: {
+      id:'s7a', npcId:'daddy',
+      posts:[
+        { type:'player', lines:[
+          { t:'action', text:'Берёшь карту. Она тёплая.' },
+          { t:'dialog', text:'Спасибо. Я... постараюсь.' }
+        ]},
+        { type:'npc', npcId:'daddy', lines:[
+          { t:'dialog', text:'Я знаю.' }
+        ]}
+      ],
+      choices:[{ text:'Продолжить →', next:'s8', rep:0 }]
+    },
+    s7b: {
+      id:'s7b', npcId:'daddy',
+      posts:[
+        { type:'player', lines:[{ t:'dialog', text:'А что там — у Выходной Двери?' }]},
+        { type:'npc', npcId:'daddy', lines:[
+          { t:'action', text:'Пауза. Очень длинная.' },
+          { t:'dialog', text:'Первое правило. Не подходить к Выходной Двери.' },
+          { t:'note', text:'Он не угрожает. Просто напоминает. Один раз.' }
+        ]}
+      ],
+      choices:[{ text:'Продолжить →', next:'s8', rep:0 }]
+    },
+    s7c: {
+      id:'s7c', npcId:'daddy',
+      posts:[
+        { type:'narrator', lines:[
+          { t:'action', text:'Ты берёшь карту молча и выходишь.' },
+          { t:'note', text:'Папочка провожает тебя взглядом.' }
+        ]}
+      ],
+      choices:[{ text:'Продолжить →', next:'s8', rep:0 }]
+    },
+
+    // ── SCENE 8 ──────────────────────────────────────────────
+    s8: {
+      id:'s8', npcId:'mamochka',
+      posts:[
+        { type:'loc',  text:'📍 Твоя комната · Дом Милый Дом' },
+        { type:'npc', npcId:'mamochka', lines:[
+          { t:'action', text:'Мамочка распахивает дверь — маленькая комната, кровать, окно с нарисованным небом на стекле (настоящего неба здесь нет).' },
+          { t:'dialog', text:'Это твоё. Можешь оформить как захочешь.' },
+          { t:'action', text:'Задерживается в дверях.' },
+          { t:'dialog', text:'И... добро пожаловать домой. Правда.' }
+        ]},
+        { type:'narrator', lines:[
+          { t:'note', text:'Пролог окончен. Playcare открыт.' }
+        ]}
+      ],
+      choices:[{ text:'🎉 Начать свободную игру', next:'hub', rep:0, relId:'mamochka', relDelta:8 }]
+    },
+
+    // ── HUB SCENES ───────────────────────────────────────────
+    hub_myroom: {
+      id:'hub_myroom', npcId:null,
+      posts:[
+        { type:'loc', text:'📍 Твоя комната · 🛏️' },
+        { type:'narrator', lines:[
+          { t:'action', text:'Твоя комната. Маленькая, но своя. На стекле окна кто-то нарисовал облака.' },
+          { t:'note', text:'Здесь можно просто побыть.' }
+        ]}
+      ],
+      choices:[{ text:'← Вернуться в хаб', next:'hub', rep:0 }]
+    },
+    hub_park: {
+      id:'hub_park', npcId:null,
+      posts:[
+        { type:'loc', text:'📍 Парк · 🌳' },
+        { type:'narrator', lines:[
+          { t:'action', text:'Статуя Папочки высится посреди парка. Вокруг — пусто. Тихо. Слишком тихо.' },
+          { t:'note', text:'Иногда сюда приходит Бубба с книгой.' }
+        ]}
+      ],
+      choices:[{ text:'← Вернуться в хаб', next:'hub', rep:0 }]
+    },
+    hub_library: {
+      id:'hub_library', npcId:null,
+      posts:[
+        { type:'loc', text:'📍 Библиотека · 📚' },
+        { type:'narrator', lines:[
+          { t:'action', text:'Ряды полок до потолка. Пахнет старой бумагой и чем-то ванильным. В углу — тихое посапывание.' },
+          { t:'note', text:'Бубба читает. Не мешай.' }
+        ]}
+      ],
+      choices:[{ text:'← Вернуться в хаб', next:'hub', rep:0 }]
+    },
+    hub_gamehouse: {
+      id:'hub_gamehouse', npcId:null,
+      posts:[
+        { type:'loc', text:'📍 Игровой Дом · 🎮' },
+        { type:'narrator', lines:[
+          { t:'action', text:'Смех, беготня, плеск воды из бассейна. Хаос — уютный.' },
+          { t:'note', text:'Не открывай случайно чужие коробки.' }
+        ]}
+      ],
+      choices:[{ text:'← Вернуться в хаб', next:'hub', rep:0 }]
+    },
+    hub_shop: {
+      id:'hub_shop', npcId:null,
+      posts:[
+        { type:'loc', text:'📍 Магазин · 🏪' },
+        { type:'narrator', lines:[
+          { t:'action', text:'Буги-бот радостно пищит, завидев тебя. Полки ломятся от мелочей.' }
+        ]}
+      ],
+      choices:[{ text:'← Вернуться в хаб', next:'hub', rep:0 }]
+    },
+    hub_school: {
+      id:'hub_school', npcId:null,
+      posts:[
+        { type:'loc', text:'📍 Школа · 🏫' },
+        { type:'narrator', lines:[
+          { t:'action', text:'Пустые парты, доска с формулами. Занятий сейчас нет — только скрип мела и эхо.' }
+        ]}
+      ],
+      choices:[{ text:'← Вернуться в хаб', next:'hub', rep:0 }]
+    },
+    hub_office: {
+      id:'hub_office', npcId:'daddy',
+      posts:[
+        { type:'loc', text:'📍 Офис Консультаций · 🏢' },
+        { type:'npc', npcId:'daddy', lines:[
+          { t:'action', text:'Кабинет закрыт. На двери табличка: «Только по вызову».' }
+        ]}
+      ],
+      choices:[{ text:'← Вернуться в хаб', next:'hub', rep:0 }]
+    },
+    hub_door: {
+      id:'hub_door', npcId:null,
+      posts:[
+        { type:'loc', text:'📍 Выходная Дверь · 🚪' },
+        { type:'narrator', lines:[
+          { t:'action', text:'Два Робо-Клоуна стоят у огромных ворот. Красные носы не мигают.' },
+          { t:'dialog', text:'«Зона ограниченного доступа. Правило первое.»' },
+          { t:'note', text:'Ты помнишь, что сказал Папочка.' }
+        ]}
+      ],
+      choices:[{ text:'← Вернуться (умно)', next:'hub', rep:0 }]
+    },
+    hub_home: {
+      id:'hub_home', npcId:'mamochka',
+      posts:[
+        { type:'loc', text:'📍 Дом Милый Дом · 🏠' },
+        { type:'npc', npcId:'mamochka', lines:[
+          { t:'action', text:'Мамочка снует по коридорам, что-то напевает.' },
+          { t:'dialog', text:'Ах, ты здесь! Всё хорошо?' }
+        ]}
+      ],
+      choices:[
+        { text:'😊 "Да, спасибо за всё"', next:'hub_home_a', rep:2, relId:'mamochka', relDelta:4 },
+        { text:'😶 Кивнуть и пройти мимо',  next:'hub', rep:0 }
+      ]
+    },
+    hub_home_a: {
+      id:'hub_home_a', npcId:'mamochka',
+      posts:[
+        { type:'player', lines:[{ t:'dialog', text:'Да, спасибо за всё.' }]},
+        { type:'npc', npcId:'mamochka', lines:[
+          { t:'action', text:'Мамочка сияет.' },
+          { t:'dialog', text:'Ой, не надо спасибо! Просто приходи, если что!' }
+        ]}
+      ],
+      choices:[{ text:'← Вернуться в хаб', next:'hub', rep:0 }]
+    }
+  };
+}
+
+var SCENES = buildScenes();
+
+// ─────────────────────────────────────────────
+//  UTIL
+// ─────────────────────────────────────────────
+function qs(sel) { return document.querySelector(sel); }
+
+function relStatus(v) {
+  if (v < 10) return 'Незнакомцы';
+  if (v < 30) return 'Знакомые';
+  if (v < 55) return 'Приятели';
+  if (v < 80) return 'Друзья';
+  return '💕 Романтика';
+}
+
+function ratingInfo() {
+  var r = G.rating;
+  if (r >= 20) return { icon:'😇', label:'Хороший',    cls:'rating-good' };
+  if (r <= -20) return { icon:'😈', label:'Плохой',     cls:'rating-evil' };
+  return             { icon:'😐', label:'Нейтральный', cls:'rating-neutral' };
+}
+
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+// ─────────────────────────────────────────────
+//  SCREENS
+// ─────────────────────────────────────────────
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  var el = qs('#screen-' + id);
+  if (el) el.classList.add('active');
+}
+
+function showCreate() {
+  buildEmojiGrid();
+  goTo('create');
+}
+
+// ─────────────────────────────────────────────
+//  CHARACTER CREATION
+// ─────────────────────────────────────────────
 function buildEmojiGrid() {
-  const catsEl = document.getElementById('emo-cats');
-  const optsEl = document.getElementById('emo-opts');
-  catsEl.innerHTML = '';
-  Object.keys(EMOJI_CATS).forEach(cat => {
-    const b = document.createElement('button');
-    b.className = 'emoji-cat-btn' + (cat === activeCat ? ' active' : '');
-    b.textContent = cat;
-    b.onclick = () => {
-      activeCat = cat;
-      document.querySelectorAll('.emoji-cat-btn').forEach(x => x.classList.remove('active'));
-      b.classList.add('active');
-      renderEmojiOpts();
-    };
-    catsEl.appendChild(b);
+  var grid = qs('#emoji-grid');
+  grid.innerHTML = '';
+  EMOJIS.forEach(function(em) {
+    var btn = document.createElement('button');
+    btn.className = 'emoji-btn';
+    btn.textContent = em;
+    btn.onclick = function() { selectEmoji(this, em); };
+    grid.appendChild(btn);
   });
-  renderEmojiOpts();
+  // pre-select first
+  var first = grid.querySelector('.emoji-btn');
+  if (first) { first.classList.add('selected'); G.player.emoji = EMOJIS[0]; }
 }
 
-function renderEmojiOpts() {
-  const optsEl = document.getElementById('emo-opts');
-  optsEl.innerHTML = '';
-  EMOJI_CATS[activeCat].forEach(e => {
-    const d = document.createElement('div');
-    d.className = 'emoji-opt';
-    d.textContent = e;
-    d.onclick = () => {
-      selEmoji = e;
-      document.getElementById('emo-preview').textContent = e;
-      document.getElementById('emo-grid').classList.remove('open');
-    };
-    optsEl.appendChild(d);
-  });
+function selectEmoji(btn, em) {
+  document.querySelectorAll('.emoji-btn').forEach(function(b){ b.classList.remove('selected'); });
+  btn.classList.add('selected');
+  G.player.emoji = em;
+  updatePreview();
 }
 
-function toggleEmojiGrid() {
-  const g = document.getElementById('emo-grid');
-  if (!g.classList.contains('open')) { buildEmojiGrid(); g.classList.add('open'); }
-  else g.classList.remove('open');
+function selectGender(btn) {
+  document.querySelectorAll('.gender-btn').forEach(function(b){ b.classList.remove('selected'); });
+  btn.classList.add('selected');
+  G.player.gender = btn.dataset.g;
+  updatePreview();
 }
 
-// ═══════════ GENDER ═══════════
-let selGender = null; // 'm' | 'f' | 'n'
-
-function setGender(g) {
-  selGender = g;
-  ['m','f','n'].forEach(x => {
-    document.getElementById('g-'+x).className = 'g-btn' + (x===g ? ' sel-'+x : '');
-  });
-  validate();
+function updatePreview() {
+  G.player.name = qs('#char-name').value.trim() || 'Имя не задано';
+  G.player.kind = qs('#char-kind').value.trim() || 'Вид не задан';
+  qs('#preview-emoji').textContent = G.player.emoji;
+  qs('#preview-name').textContent = G.player.name;
+  qs('#preview-meta').textContent = G.player.kind + ' · ' + G.player.gender;
 }
-
-function validate() {
-  const ok = document.getElementById('inp-name').value.trim().length > 0
-          && document.getElementById('inp-species').value.trim().length > 0
-          && selGender !== null;
-  document.getElementById('btn-start').disabled = !ok;
-}
-
-// ═══════════ STATE ═══════════
-const G = {
-  name:'', species:'', look:'', gender:'f', emoji:'🐾',
-  tokens:0, rel:0,
-  phase:'intro', betrayed:null,
-  scene:0,
-};
-
-// pronouns helper
-function pro(m,f,n){ return G.gender==='m'?m:G.gender==='f'?f:n; }
-// "он/она/они"
-const P = {
-  nom:()=>pro('он','она','они'),
-  gen:()=>pro('его','её','их'),
-  acc:()=>pro('его','её','их'),
-  ins:()=>pro('им','ей','ими'),
-  prep:()=>pro('нём','ней','них'),
-  adj_short:()=>pro('(-ой)','(-ая/-ой)','(-ые)'),
-  suf:()=>pro('','(-а)',''),  // глагольный суффикс: пришёл / пришла / пришли
-  verb:s=>pro(s, s.replace(/л\b/,'ла').replace(/лся\b/,'лась'), s.replace(/л\b/,'ли').replace(/лся\b/,'лись')),
-};
 
 function startGame() {
-  G.name    = document.getElementById('inp-name').value.trim();
-  G.species = document.getElementById('inp-species').value.trim();
-  G.look    = document.getElementById('inp-look').value.trim();
-  G.gender  = selGender;
-  G.emoji   = selEmoji;
+  var name = qs('#char-name').value.trim();
+  var kind = qs('#char-kind').value.trim();
+  if (!name) { qs('#char-name').focus(); qs('#char-name').style.borderColor='#f87171'; return; }
+  if (!kind)  { qs('#char-kind').focus();  qs('#char-kind').style.borderColor='#f87171'; return; }
+  G.player.name = name;
+  G.player.kind = kind;
+  G.player.look = qs('#char-look').value.trim();
+  // gender from selection
+  var gsel = document.querySelector('.gender-btn.selected');
+  G.player.gender = gsel ? gsel.dataset.g : '♂';
 
-  document.getElementById('bar-emo').textContent  = G.emoji;
-  document.getElementById('bar-name').textContent = G.name;
-  document.getElementById('bar-sp').textContent   = G.species + (G.look ? ' · ' + G.look : '');
-  updateTokens(0);
-
-  goTo('s-game');
-  startStory();
+  buildHub();
+  updateTopbar();
+  goTo('game');
+  runScene('s1');
 }
 
-// ═══════════ NAV ═══════════
-function goTo(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo(0,0);
+// ─────────────────────────────────────────────
+//  TOPBAR + RELATION
+// ─────────────────────────────────────────────
+function updateTopbar() {
+  qs('#topbar-emoji').textContent = G.player.emoji;
+  qs('#topbar-name').textContent  = G.player.name;
+  qs('#topbar-kind').textContent  = G.player.kind + ' ' + G.player.gender;
+  var ri = ratingInfo();
+  qs('#rating-icon').textContent  = ri.icon;
+  qs('#rating-label').textContent = ri.label;
+  qs('#topbar-rating').className  = ri.cls;
 }
 
-// ═══════════ STORY HELPERS ═══════════
-function addBlock(emoStr, nameStr, color, html, cls='') {
-  const w = document.getElementById('story-wrap');
-  const d = document.createElement('div');
-  d.className = 's-block ' + cls;
-  d.innerHTML = `
-    <div class="npc-row">
-      <span class="npc-emo">${emoStr}</span>
-      <span class="npc-nm" style="color:${color}">${nameStr}</span>
-    </div>
-    <div class="s-text">${html}</div>`;
-  w.appendChild(d);
-  d.scrollIntoView({behavior:'smooth',block:'end'});
-}
-function narr(html) {
-  addBlock('💡','Повествование','#5a4d7a', html, 's-narrator');
-}
-function npc(emo,name,color,html) { addBlock(emo,name,color,html); }
-function player(html) {
-  addBlock(G.emoji, G.name, 'var(--accent)', html, 's-player');
+function showRelBar(npcId) {
+  if (!npcId || !NPC[npcId]) { hideRelBar(); return; }
+  var val = G.relations[npcId] || 0;
+  var npc = NPC[npcId];
+  qs('#rel-name').textContent   = npc.emoji + ' ' + npc.name + ' — Отношения';
+  qs('#rel-pct').textContent    = val + '%';
+  qs('#rel-fill').style.width   = val + '%';
+  qs('#rel-status').textContent = relStatus(val);
+  qs('#relation-bar').classList.add('visible');
 }
 
-function setChoices(list) {
-  const w = document.getElementById('choices-wrap');
-  w.innerHTML = '';
-  list.forEach((c,i) => {
-    const b = document.createElement('button');
-    b.className = 'ch-btn';
-    b.innerHTML = `<span class="ch-num">${i+1}</span>${c.t}`;
-    b.onclick = c.a;
-    w.appendChild(b);
+function hideRelBar() {
+  qs('#relation-bar').classList.remove('visible');
+}
+
+// ─────────────────────────────────────────────
+//  HUB
+// ─────────────────────────────────────────────
+function buildHub() {
+  var hub = qs('#hub');
+  hub.innerHTML = '';
+  LOCS.forEach(function(loc) {
+    var btn = document.createElement('button');
+    btn.className = 'hub-btn';
+    btn.id = 'hub-' + loc.id;
+    btn.innerHTML = '<span class="hub-icon">' + loc.icon + '</span><span class="hub-label">' + loc.label + '</span>';
+    btn.onclick = function() { hubGo(loc.id); };
+    hub.appendChild(btn);
   });
-  w.scrollIntoView({behavior:'smooth',block:'end'});
-}
-function clrChoices(){ document.getElementById('choices-wrap').innerHTML=''; }
-
-function updateTokens(d) {
-  G.tokens += d;
-  document.getElementById('bar-tokens').textContent = '🪙 ' + G.tokens;
-  if (d>0) notif(`+${d} токен${d>1?'а':''} 🪙`);
 }
 
-function updateRel(d) {
-  G.rel = Math.max(0, Math.min(100, G.rel+d));
-  document.getElementById('rel-panel').style.display = 'block';
-  document.getElementById('rel-fill').style.width = G.rel+'%';
-  document.getElementById('rel-pct').textContent = G.rel+'%';
-  const stages = [[80,'💕 Отношения'],[55,'💛 Близкие друзья'],[30,'😊 Приятели'],[10,'😐 Нейтрально'],[0,'Незнакомцы']];
-  const st = stages.find(s=>G.rel>=s[0]);
-  document.getElementById('rel-stage').textContent = st?st[1]:'Незнакомцы';
+function showHub() {
+  G.hubActive = true;
+  qs('#hub').classList.add('visible');
+  qs('#choices-wrap').classList.add('hidden');
+  hideRelBar();
 }
 
-function notif(msg) {
-  const n = document.getElementById('notif');
-  n.textContent = msg; n.classList.add('show');
-  setTimeout(()=>n.classList.remove('show'), 2600);
+function hideHub() {
+  G.hubActive = false;
+  qs('#hub').classList.remove('visible');
 }
 
-// color shorthands
-const C = {
-  rabi:   '#f9a8d4',
-  simon:  '#fca5a5',
-  mama:   '#c084fc',
-  day:    '#fb923c',
-  bubba:  '#93c5fd',
-  ally:   '#6ee7b7',
-  narr:   '#5a4d7a',
-};
-
-// ═══════════ SCENES ═══════════
-function startStory() {
-  document.getElementById('story-wrap').innerHTML = '';
-  clrChoices();
-  sc_intro();
-}
-
-/* ── Интро ── */
-function sc_intro() {
-  G.phase = 'intro';
-  narr(`<em>Лампа-солнце мигает раз, другой — и разгорается ровным тёплым светом. Playcare просыпается.</em><br><br>
-    Ты ${P.verb('помнил')} мусоропровод, темноту, скрежет — а потом длинные розовые руки и голос: <em>"Бедняжка, нашёлся!"</em>
-    Это была <strong style="color:${C.mama}">Мамочка Лонг Ленг</strong>. Она ${P.verb('назвала')} тебя <strong style="color:var(--accent)">${G.name}</strong> и ${P.verb('дала')} комнату в огромном подземном куполе.`);
-
-  setTimeout(()=>{
-    npc('👩','Мамочка Лонг Ленг',C.mama,
-      `— <strong style="color:var(--accent)">${G.name}!</strong> — её голос звенит из коридора, тёплый, как свежая выпечка. — Завтрак стынет, моя дорогая ${G.species}! Сегодня первый по-настоящему <em>твой</em> день. Иди знакомиться — здесь все свои!`);
-    setTimeout(()=>{
-      setChoices([
-        {t:'Выйти в коридор и осмотреться',        a:sc_corridor},
-        {t:'Поблагодарить Мамочку и спросить про столовую', a:sc_mama_talk},
-      ]);
-    },300);
-  },600);
-}
-
-function sc_mama_talk() {
-  clrChoices();
-  player(`— Мамочка, спасибо за всё... А где тут столовая?`);
-  setTimeout(()=>{
-    npc('👩','Мамочка Лонг Ленг',C.mama,
-      `Она улыбается — широко, искренне. Длинная рука указывает в конец коридора. — <em>Прямо и налево, мой хороший ${G.species}.</em> Там уже собираются. Она чуть наклоняется: — <strong>И не обращай внимания на Раби. Она бывает резкой с новенькими.</strong>`);
-    setTimeout(()=>sc_corridor(), 400);
-  },400);
-}
-
-/* ── Коридор ── */
-function sc_corridor() {
-  clrChoices();
-  narr(`Коридор «Дома Милого Дома» длинный и шумный. Из-за угла несётся смех — это <strong style="color:${C.ally}">Хоппи</strong> вихрем мчится к столовой. Запах завтрака перебивает всё. Кто-то шепчет.`);
-  setTimeout(()=>{
-    npc('🦇','Раби',C.rabi,
-      `У стены — белоснежная летучая мышь с розовыми крыльями. Кулон-капля крови покачивается на шее. Она смотрит <em>на тебя</em> с холодным любопытством, наклоняется к тёмно-зелёному аллигатору рядом и что-то шепчет. Оба смотрят. Раби усмехается.<br><br>— <em>Мусоропроводный подарочек,</em> — произносит она негромко, но так, чтобы ты ${P.verb('слышал')}.`);
-    setTimeout(()=>{
-      setChoices([
-        {t:'Сделать вид, что не слышал(-а), и пройти мимо', a:sc_ignore_rabi},
-        {t:'Остановиться и посмотреть Раби в глаза',         a:sc_stare_rabi},
-        {t:'Зайти в столовую — там виден Дэй',               a:sc_dining},
-      ]);
-    },300);
-  },700);
-}
-
-function sc_ignore_rabi() {
-  clrChoices();
-  player(`<em>(${P.verb('проходишь')} мимо, не оглядываясь)</em>`);
-  setTimeout(()=>{
-    npc('🦇','Раби',C.rabi,`За спиной — тихий смех. — <em>Ой, оно даже не умеет отвечать.</em> Аллистер лениво зевает рядом.`);
-    setTimeout(()=>sc_dining(), 500);
-  },400);
-}
-
-function sc_stare_rabi() {
-  clrChoices();
-  player(`<em>(${P.verb('останавливаешься')} и смотришь ей прямо в глаза — молча)</em>`);
-  setTimeout(()=>{
-    npc('🦇','Раби',C.rabi,
-      `Она не ожидала. На секунду в её взгляде — что-то похожее на удивление. Потом снова маска. — Смотри-смотри. <em>${G.name} с претензиями.</em> Она отворачивается, но пальцы сжимаются на кулоне чуть крепче.`);
-    updateRel(5); notif('Раби заметила тебя (+5)');
-    setTimeout(()=>sc_dining(), 600);
-  },400);
-}
-
-/* ── Столовая ── */
-function sc_dining() {
-  clrChoices();
-  narr(`Столовая гудит. <strong style="color:${C.day}">Дэй</strong> — оранжевый пёс с красными ушами — машет тебе с такой радостью, будто знает тебя всю жизнь. Рядом — голубой слон <strong style="color:${C.bubba}">Бубба</strong> с книгой. Где-то позади — отзвук крыльев. Раби ${P.verb('зашёл')}... вошла следом.`);
-  setTimeout(()=>{
-    npc('🐶','Дэй',C.day,
-      `— О, ты ${G.name}! ♂ Мамочка говорила! — тянет руку. — Я Дэй. Это лучшее место, серьёзно! Минус то, что выхода нет, но зато завтрак всегда горячий!`);
-    setTimeout(()=>{
-      setChoices([
-        {t:'Сесть рядом с Дэем и Буббой',       a:sc_sit_day},
-        {t:'Взять еду и наблюдать из стороны',   a:sc_observe},
-      ]);
-    },300);
-  },600);
-}
-
-function sc_sit_day() {
-  clrChoices();
-  player(`— Приятно познакомиться, Дэй. — <em>садишься рядом</em>`);
-  updateTokens(1);
-  setTimeout(()=>{
-    npc('🐘','Бубба',C.bubba,
-      `♂ — Добро пожаловать. Если захочешь в библиотеку — покажу. Там тихо. — <em>утыкается обратно в книгу</em>`);
-    setTimeout(()=>{
-      narr(`Завтрак идёт своим чередом. Но ты замечаешь: через три стола от тебя Раби шепчет <strong style="color:${C.simon}">Саймону</strong> — светло-алому дракону с золотыми рогами и серьгами. Тот смотрит в твою сторону и лениво ухмыляется.`);
-      setTimeout(()=>{
-        setChoices([
-          {t:'Не обращать внимания — завтрак важнее', a:sc_end_breakfast},
-          {t:'Поймать взгляд Саймона и не отводить',  a:sc_simon_stare},
-        ]);
-      },400);
-    },600);
-  },400);
-}
-
-function sc_observe() {
-  clrChoices();
-  player(`<em>(берёшь поднос и садишься в сторонке — наблюдаешь)</em>`);
-  setTimeout(()=>{
-    narr(`С этой точки видно всё. Раби — в центре, как всегда. Она шепчет что-то <strong style="color:${C.simon}">Саймону</strong>, кивает в твою сторону. Дракон смотрит оценивающе. Ты замечаешь: в руке у Раби что-то блестит. Маленький потрёпанный блокнот.`);
-    setTimeout(()=>{
-      setChoices([
-        {t:'Запомнить блокнот — потом разберёмся', a:sc_end_breakfast},
-        {t:'Подойти к Саймону — пусть привыкает',  a:sc_simon_stare},
-      ]);
-    },400);
-  },500);
-}
-
-function sc_simon_stare() {
-  clrChoices();
-  player(`<em>(смотришь на Саймона — спокойно, не отводя взгляда)</em>`);
-  setTimeout(()=>{
-    npc('🐉','Саймон',C.simon,
-      `♂ Дракон приподнимает бровь с серьгой. Усмехается — медленно, нехотя. — <em>О. Новенький(-ая) с характером.</em> Кидает что-то Раби — та дёргается, ловит, прячет. Саймон отворачивается первым, но улыбка остаётся.`);
-    updateRel(3);
-    setTimeout(()=>sc_end_breakfast(), 500);
-  },400);
-}
-
-/* ── После завтрака ── */
-function sc_end_breakfast() {
-  clrChoices();
-  G.scene = 2; G.phase = 'rabi_bully';
-  narr(`Завтрак заканчивается. День в Playcare начинается — школа, свободное время, парк. Но ещё до уроков ты слышишь: кто-то смеётся. И слышишь своё имя — в чужих ртах, с интонацией, которая не сулит ничего хорошего. <em>Раби начала работу.</em>`);
-  setTimeout(()=>{
-    npc('🦇','Раби',C.rabi,
-      `♀ Она стоит у доски объявлений. Вокруг несколько игрушек. — Слышали? <strong style="color:var(--accent)">${G.name}</strong> живёт здесь, потому что от ${P.gen()} избавились. Как от мусора. — Хихикает. — Ой, я просто <em>рассказала</em> что видела в документах Мамочки...`);
-    setTimeout(()=>{
-      setChoices([
-        {t:'Пройти мимо — слова не ранят',       a:sc_rabi_walk},
-        {t:'— Это правда. И что с того?',         a:sc_rabi_confront},
-        {t:'Уйти в парк — подумать в тишине',     a:sc_park},
-      ]);
-    },400);
-  },700);
-}
-
-function sc_rabi_walk() {
-  clrChoices();
-  player(`<em>(${P.verb('проходишь')} мимо молча — голова прямо)</em>`);
-  setTimeout(()=>{
-    narr(`Смех стихает быстрее, чем ты ожидал(-а). Кто-то из толпы — кажется, красная медведица <strong>Бобби</strong> ♀ — смотрит с тихим уважением. Раби провожает взглядом. <em>Ей не понравилось, что ты не сломал(-ась).</em>`);
-    updateRel(4);
-    setTimeout(()=>sc_park(), 500);
-  },400);
-}
-
-function sc_rabi_confront() {
-  clrChoices();
-  player(`— Это правда. И что с того?`);
-  setTimeout(()=>{
-    npc('🦇','Раби',C.rabi,
-      `♀ Она моргает. Не ожидала прямого ответа. Толпа притихла. Раби снова улыбается — но чуть напряжённее. — <em>Ничего. Просто... интересно.</em> Уходит быстро. Аллистер ♂ зевает ей вслед.`);
-    updateRel(8); updateTokens(2);
-    notif('Ты не сломал(-ась). +2 токена 💪');
-    setTimeout(()=>sc_park(), 600);
-  },500);
-}
-
-/* ── Парк ── */
-function sc_park() {
-  clrChoices();
-  G.scene = 3;
-  narr(`Парк в центре Playcare. Статуя Папочки Лонг Ленга смотрит сверху — с лёгкой официальной улыбкой. Под ней — подвал с генератором. Здесь тихо... пока.`);
-  setTimeout(()=>{
-    narr(`Ты почти один(-а). Но у скамейки — силуэт в тени. Белоснежный мех, розовые крылья. Раби сидит одна — что-то листает. <strong>Тот самый блокнот.</strong> Она не замечает тебя. Или делает вид.`);
-    setTimeout(()=>{
-      setChoices([
-        {t:'Подойти и сесть рядом — молча',      a:sc_sit_rabi},
-        {t:'Присмотреться: что за блокнот?',      a:sc_spy_nb},
-        {t:'Уйти — лучше не связываться сейчас', a:sc_free_time},
-      ]);
-    },400);
-  },700);
-}
-
-function sc_sit_rabi() {
-  clrChoices();
-  player(`<em>(подходишь и садишься рядом на скамейку — молча)</em>`);
-  setTimeout(()=>{
-    npc('🦇','Раби',C.rabi,
-      `♀ Резко закрывает блокнот. Смотрит настороженно. Молчит. Потом, медленно: — <em>Чего тебе?</em> Не грубо. Почти настоящий вопрос.`);
-    setTimeout(()=>{
-      narr(`Вы сидите рядом. Лампа-солнце греет. Из Игрового Дома доносится шум. Раби не уходит.`);
-      updateRel(6);
-      setTimeout(()=>{
-        setChoices([
-          {t:'— Ничего. Просто тут хорошо.',        a:sc_rabi_small},
-          {t:'— Интересный у тебя блокнот.',         a:sc_nb_mention},
-        ]);
-      },400);
-    },500);
-  },400);
-}
-
-function sc_rabi_small() {
-  clrChoices();
-  player(`— Ничего. Просто тут хорошо.`);
-  setTimeout(()=>{
-    npc('🦇','Раби',C.rabi,
-      `♀ Фыркает — но без злости. — <em>Ты странный(-ая).</em> Молчание. Потом, почти неслышно: — <em>...Да. Тут нормально.</em>`);
-    updateRel(7); updateTokens(1);
-    setTimeout(()=>sc_free_time(), 600);
-  },400);
-}
-
-function sc_spy_nb() {
-  clrChoices();
-  player(`<em>(остаёшься в тени — наблюдаешь, не приближаясь)</em>`);
-  setTimeout(()=>{
-    narr(`Ты видишь: страницы плотно заполнены — схемы, имена, что-то похожее на расписание. И фотография. Кто-то из Кошмарных Зверят делает то, чего явно не должен делать в Playcare. Раби это <em>знает</em>. И хранит.<br><br><strong style="color:var(--accent2,#f472b6)">Ты запоминаешь.</strong>`);
-    G.phase = 'docs_found';
-    notif('📓 Ты видел(-а) блокнот Раби...');
-    setTimeout(()=>sc_free_time(), 700);
-  },500);
-}
-
-function sc_nb_mention() {
-  clrChoices();
-  player(`— Интересный у тебя блокнот.`);
-  setTimeout(()=>{
-    npc('🦇','Раби',C.rabi,
-      `♀ Резко поворачивается. Белые зрачки расширяются. — <em>Откуда ты зна... ты не видел(-а) ничего.</em> Голос ровный, но пальцы сжимают блокнот до хруста. — <strong>Ничего.</strong>`);
-    G.phase = 'docs_found';
-    notif('📓 Раби взволнована. Ты что-то знаешь.');
-    updateRel(5);
-    setTimeout(()=>sc_free_time(), 700);
-  },500);
-}
-
-/* ── Свободное время / магазин ── */
-function sc_free_time() {
-  clrChoices();
-  G.scene = 4;
-  if (G.phase === 'docs_found') {
-    setTimeout(()=>sc_docs_confrontation(), 800);
-    return;
+function hubGo(locId) {
+  var sceneId = 'hub_' + locId;
+  if (SCENES[sceneId]) {
+    hideHub();
+    runScene(sceneId);
+  } else {
+    // placeholder
+    hideHub();
+    addLocTag('📍 ' + LOCS.find(function(l){ return l.id===locId; }).label);
+    addNarratorPost([{ t:'note', text:'Здесь пока ничего не происходит.' }]);
+    showChoices([{ text:'← Назад в хаб', next:'hub', rep:0 }]);
   }
-  narr(`День идёт своим чередом. <em>Раби продолжает шептаться.</em> Но иногда ты замечаешь: она смотрит на тебя чуть дольше, чем нужно сплетнице.`);
-  setTimeout(()=>{
-    setChoices([
-      {t:'Заглянуть в Магазин — посмотреть на подарки', a:sc_shop},
-      {t:'Подождать: что-то скоро произойдёт',           a:()=>{clrChoices();sc_docs_confrontation();}},
-    ]);
-  },400);
 }
 
-function sc_shop() {
-  clrChoices();
-  npc('🤖','Буги-бот','#86efac',
-    `Маленький робот на гусеницах выкатывается из-за прилавка. — <em>Привет-привет, ${G.name}! У нас сегодня:</em> 🎀 <strong>Красивая заколка</strong> (5🪙), 🍬 <strong>Пакет сладкого</strong> (2🪙), 📚 <strong>Книга</strong> (3🪙). Всё для тебя!`);
-  setTimeout(()=>{
-    const opts = [];
-    if (G.tokens >= 2) opts.push({t:`Купить сладкое для Раби (2🪙)`,  a:()=>sc_buy('candy')});
-    if (G.tokens >= 5) opts.push({t:`Купить заколку для Раби (5🪙)`,  a:()=>sc_buy('clip')});
-    opts.push({t:'Не сейчас — вернуться к истории', a:sc_docs_confrontation});
-    setChoices(opts);
-  },400);
+// ─────────────────────────────────────────────
+//  FEED RENDERING
+// ─────────────────────────────────────────────
+function clearFeed() {
+  qs('#feed-wrap').innerHTML = '';
 }
 
-function sc_buy(type) {
-  clrChoices();
-  const cost = type==='candy'?2:5;
-  const item = type==='candy'?'пакет сладкого':'красивую заколку';
-  G.tokens -= cost;
-  document.getElementById('bar-tokens').textContent = '🪙 '+G.tokens;
-  player(`<em>(покупаешь ${item} — для Раби)</em>`);
-  updateRel(type==='candy'?8:14);
-  notif(`Подарок куплен! 🎁`);
-  setTimeout(()=>sc_docs_confrontation(), 700);
+function scrollFeed() {
+  var fw = qs('#feed-wrap');
+  fw.scrollTop = fw.scrollHeight;
 }
 
-/* ── Конфронтация с дневником ── */
-function sc_docs_confrontation() {
-  clrChoices();
-  G.scene = 5; G.phase = 'choice';
-  narr(`Вечер. Тихий коридор. Раби почти сталкивается с тобой за углом — вздрагивает. В руках блокнот. Из него на пол выпадает страница. Ты успеваешь поднять её первым(-ой).<br><br><em>Фото. Имена. Схема. Это не должно было существовать.</em>`);
-  setTimeout(()=>{
-    npc('🦇','Раби',C.rabi,
-      `♀ — Отдай. — Голос тихий, но в нём — что-то настоящее. Не злость. <em>Страх.</em> — Пожалуйста. — Последнее слово даётся ей с трудом.`);
-    setTimeout(()=>{
-      document.getElementById('modal-docs').classList.add('open');
-    },500);
-  },700);
+function addLocTag(text) {
+  var el = document.createElement('div');
+  el.className = 'location-tag fade-in';
+  el.textContent = text;
+  qs('#feed-wrap').appendChild(el);
+  scrollFeed();
 }
 
-function chooseBetrayal() {
-  document.getElementById('modal-docs').classList.remove('open');
-  G.betrayed = true; G.phase = 'betrayal';
-  player(`— Мне нужно поговорить с Мамочкой Лонг Ленг.`);
-  setTimeout(()=>{
-    npc('🦇','Раби',C.rabi,
-      `♀ Застывает. Розовые крылья сжимаются. — <em>Нет... нет-нет-нет...</em> Пятится. В её глазах — настоящий ужас. <strong>Не маска. Не игра.</strong>`);
-    setTimeout(()=>{
-      npc('👩','Мамочка Лонг Ленг',C.mama,
-        `♀ Мамочка появляется в конце коридора — будто почувствовала. Ты протягиваешь страницу. Она читает. Её лицо меняется медленно, страшно.<br>— <em>Раби... в мой кабинет. Сейчас.</em><br><br>Раби проходит мимо тебя, не поднимая взгляда. Её кулон-капля дрожит.`);
-      setTimeout(()=>{
-        narr(`Раби проводят к Папочке Лонг Ленгу. Через час становится известно: <strong>неделя в подвале</strong>. Коридоры затихают. Саймон ♂ смотрит в твою сторону — долго, без улыбки.`);
-        setTimeout(()=>{
-          setChoices([
-            {t:'Это был правильный поступок... наверное', a:sc_aftermath},
-            {t:'Жаль. Но у неё не было выбора',           a:sc_aftermath},
-          ]);
-        },500);
-      },800);
-    },600);
-  },500);
-}
+function addPost(post, delay) {
+  delay = delay || 0;
+  setTimeout(function() {
+    var div = document.createElement('div');
+    var cls = 'post';
+    if (post.type === 'player')   cls += ' post-player';
+    if (post.type === 'narrator') cls += ' post-narrator';
+    div.className = cls;
 
-function chooseMercy() {
-  document.getElementById('modal-docs').classList.remove('open');
-  G.betrayed = false; G.phase = 'friends';
-  player(`<em>(смотришь на страницу — и возвращаешь её Раби)</em> — Это твоё.`);
-  setTimeout(()=>{
-    npc('🦇','Раби',C.rabi,
-      `♀ Берёт страницу дрожащими пальцами. Молчит. Долго. Потом поднимает взгляд — и впервые ты видишь её <em>без маски</em>.<br><br>— <strong>...Почему?</strong>`);
-    setTimeout(()=>{
-      player(`— Потому что это не моё дело.`);
-      setTimeout(()=>{
-        npc('🦇','Раби',C.rabi,
-          `♀ Хмыкает — но это не насмешка. Что-то совсем другое. — <em>Ты идиот(-ка).</em> Пауза. — <em>...Спасибо.</em><br><br>Уходит быстро — но у поворота оглядывается. Один раз.`);
-        updateRel(25); updateTokens(3);
-        notif('💗 Раби запомнила это. +25 к отношениям');
-        setTimeout(()=>sc_aftermath(), 700);
-      },500);
-    },500);
-  },500);
-}
-
-/* ── Последствия ── */
-function sc_aftermath() {
-  clrChoices();
-  G.scene = 6;
-  narr(`Дни идут. Playcare живёт своим ритмом. <em>Но что-то изменилось.</em>`);
-  setTimeout(()=>{
-    if (G.betrayed) {
-      narr(`Когда Раби ♀ вернулась из подвала — она не смотрит на тебя. Совсем. Саймон ♂ и Кошмарные Зверята обходят тебя стороной. <em>Ты ${P.verb('сделал')} выбор. Придётся жить с ним.</em>`);
-    } else {
-      npc('🦇','Раби',C.rabi,
-        `♀ Раби больше не шепчет про тебя гадостей. На следующий день — молча ставит на твой поднос что-то сладкое и отворачивается прежде, чем ты успеваешь сказать спасибо. Это её язык. <em>Ты учишься его понимать.</em>`);
+    // header for npc/player
+    if (post.type === 'npc' && post.npcId) {
+      var npc = NPC[post.npcId];
+      if (npc) {
+        var hdr = document.createElement('div');
+        hdr.className = 'post-header';
+        hdr.innerHTML = '<span class="post-avatar">' + npc.emoji + '</span>'
+          + '<span class="post-speaker" style="color:' + npc.color + '">' + npc.name + '</span>'
+          + '<span class="post-gender">' + npc.gender + '</span>';
+        div.appendChild(hdr);
+      }
+    } else if (post.type === 'player') {
+      var hdr2 = document.createElement('div');
+      hdr2.className = 'post-header';
+      hdr2.innerHTML = '<span class="post-avatar">' + G.player.emoji + '</span>'
+        + '<span class="post-speaker" style="color:var(--accent3)">' + G.player.name + '</span>'
+        + '<span class="post-gender">' + G.player.gender + '</span>';
+      div.appendChild(hdr2);
     }
-    setTimeout(()=>{
-      narr(`<strong style="color:var(--accent)">История только начинается.</strong> В Playcare 16 игрушек — каждая целый мир. Два клана, тайны, правила Папочки и лампа-солнце, которая всегда гаснет.`);
-      setTimeout(()=>{
-        setChoices([
-          {t:'Что сегодня в Игровом Доме?',           a:sc_continue},
-          {t:'Найти Раби и поговорить снова',          a:sc_continue},
-          {t:'Заглянуть в магазин за подарком',        a:sc_shop_end},
-        ]);
-      },400);
-    },700);
-  },600);
+
+    // body lines
+    var body = document.createElement('div');
+    body.className = 'post-body';
+    (post.lines || []).forEach(function(line) {
+      var p = document.createElement('p');
+      if (line.t === 'action') {
+        p.className = 'post-action';
+        p.innerHTML = '<strong>' + escHtml(line.text) + '</strong>';
+      } else if (line.t === 'dialog') {
+        p.className = 'post-dialog';
+        p.textContent = line.text;
+      } else {
+        p.className = 'post-note';
+        p.textContent = line.text;
+      }
+      body.appendChild(p);
+    });
+    div.appendChild(body);
+    qs('#feed-wrap').appendChild(div);
+    scrollFeed();
+  }, delay);
 }
 
-function sc_shop_end() {
-  clrChoices();
-  npc('🤖','Буги-бот','#86efac',
-    `— ${G.name}! Снова ты! У нас свежие поступления. Выбирай!`);
-  setTimeout(()=>{
-    const opts = [];
-    if (G.tokens >= 2) opts.push({t:`Купить сладкое (2🪙)`, a:()=>{G.tokens-=2;document.getElementById('bar-tokens').textContent='🪙 '+G.tokens;updateRel(6);notif('🍬 Раби будет рада');sc_continue();}});
-    if (G.tokens >= 5) opts.push({t:`Купить заколку (5🪙)`, a:()=>{G.tokens-=5;document.getElementById('bar-tokens').textContent='🪙 '+G.tokens;updateRel(12);notif('🎀 Красивый подарок!');sc_continue();}});
-    opts.push({t:'Ничего не нужно сейчас', a:sc_continue});
-    setChoices(opts);
-  },400);
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-function sc_continue() {
-  clrChoices();
-  narr(`<em>...Лампа-солнце мигает. Playcare ждёт.</em><br><br>
-    <strong style="color:var(--accent);font-size:1.05rem">— ПРОДОЛЖЕНИЕ СЛЕДУЕТ —</strong><br><br>
-    <span style="color:var(--dim);font-size:.83rem">Версия 1.1 · Следующее обновление: свободное перемещение, арка Саймона, все 16 персонажей</span>`);
-  setTimeout(()=>{
-    setChoices([
-      {t:'🔄 Начать заново (новый персонаж)', a:()=>{goTo('s-title');}},
-    ]);
-  },400);
+function addNarratorPost(lines) {
+  addPost({ type:'narrator', lines: lines });
 }
 
-function sendTxt() {
-  const inp = document.getElementById('player-txt');
-  const v = inp.value.trim();
-  if (!v) return;
-  inp.value = '';
-  player(v);
+// ─────────────────────────────────────────────
+//  CHOICES
+// ─────────────────────────────────────────────
+function showChoices(choices) {
+  var wrap = qs('#choices-wrap');
+  wrap.innerHTML = '';
+  wrap.classList.remove('hidden');
+  choices.forEach(function(c) {
+    var btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    if (c.next === 'hub' || c.text.indexOf('→') >= 0 || c.text.indexOf('←') >= 0) {
+      btn.classList.add('next-btn');
+    }
+    btn.textContent = c.text;
+    btn.onclick = function() { handleChoice(c); };
+    wrap.appendChild(btn);
+  });
 }
+
+function hideChoices() {
+  var wrap = qs('#choices-wrap');
+  wrap.classList.add('hidden');
+  wrap.innerHTML = '';
+}
+
+function handleChoice(c) {
+  hideChoices();
+
+  // reputation
+  if (c.rep) {
+    G.rating = clamp(G.rating + c.rep, -100, 100);
+    updateTopbar();
+  }
+  // relation
+  if (c.relId && c.relDelta) {
+    G.relations[c.relId] = clamp((G.relations[c.relId] || 0) + c.relDelta, 0, 100);
+  }
+
+  if (typeof c.next === 'function') {
+    c.next();
+  } else if (c.next === 'hub') {
+    finishToHub();
+  } else if (SCENES[c.next]) {
+    runScene(c.next);
+  } else {
+    finishToHub();
+  }
+}
+
+// ─────────────────────────────────────────────
+//  SCENE RUNNER
+// ─────────────────────────────────────────────
+function runScene(sceneId) {
+  if (sceneId === 'hub') { finishToHub(); return; }
+  var scene = SCENES[sceneId];
+  if (!scene) { finishToHub(); return; }
+
+  G.scene = sceneId;
+  hideHub();
+
+  // if scene has an npc, show relation bar
+  if (scene.npcId) {
+    showRelBar(scene.npcId);
+  } else {
+    hideRelBar();
+  }
+
+  // render posts with small delays for feel
+  var delay = 0;
+  (scene.posts || []).forEach(function(post) {
+    if (post.type === 'loc') {
+      setTimeout(function(){ addLocTag(post.text); }, delay);
+      delay += 200;
+    } else {
+      addPost(post, delay);
+      delay += 350;
+    }
+  });
+
+  // show choices after posts
+  setTimeout(function() {
+    if (scene.choices && scene.choices.length) {
+      showChoices(scene.choices);
+    }
+  }, delay + 100);
+}
+
+function finishToHub() {
+  G.prologDone = true;
+  hideChoices();
+  hideRelBar();
+  showHub();
+}
+
+// ─────────────────────────────────────────────
+//  SAVE / LOAD
+// ─────────────────────────────────────────────
+function openSaveModal(mode) {
+  G.saveMode = mode;
+  var modal = qs('#save-modal');
+  qs('#modal-title').textContent = mode === 'save' ? '💾 Сохранить игру' : '📂 Загрузить игру';
+  renderSaveSlots(mode);
+  modal.classList.add('open');
+}
+
+function closeSaveModal() {
+  qs('#save-modal').classList.remove('open');
+}
+
+function renderSaveSlots(mode) {
+  var wrap = qs('#save-slots');
+  wrap.innerHTML = '';
+  for (var i = 1; i <= 3; i++) {
+    var key = 'playcare_save_' + i;
+    var raw = null;
+    try { raw = localStorage.getItem(key); } catch(e){}
+    var slot = null;
+    if (raw) { try { slot = JSON.parse(raw); } catch(e){} }
+
+    var div = document.createElement('div');
+    div.className = 'save-slot';
+    var slotNum = i;
+    if (slot) {
+      div.innerHTML = '<div class="save-slot-info">Слот ' + i + ' · ' + slot.player.emoji + ' ' + slot.player.name + '</div>'
+        + '<div class="save-slot-time">' + (slot.ts || '—') + '</div>';
+      if (mode === 'load') {
+        div.onclick = function(n){ return function(){ loadGame(n); closeSaveModal(); }; }(slotNum);
+      } else {
+        div.onclick = function(n){ return function(){ saveGame(n); closeSaveModal(); }; }(slotNum);
+      }
+    } else {
+      div.innerHTML = '<div class="save-slot-info">Слот ' + i + ' — пусто</div><div class="save-slot-time">—</div>';
+      if (mode === 'save') {
+        div.onclick = function(n){ return function(){ saveGame(n); closeSaveModal(); }; }(slotNum);
+      } else {
+        div.style.opacity = '0.4'; div.style.cursor = 'default';
+      }
+    }
+    wrap.appendChild(div);
+  }
+}
+
+function saveGame(slot) {
+  var data = {
+    player: G.player,
+    rating: G.rating,
+    relations: G.relations,
+    prologDone: G.prologDone,
+    scene: G.scene,
+    ts: new Date().toLocaleString('ru-RU', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' })
+  };
+  try { localStorage.setItem('playcare_save_' + slot, JSON.stringify(data)); } catch(e){}
+}
+
+function loadGame(slot) {
+  var raw = null;
+  try { raw = localStorage.getItem('playcare_save_' + slot); } catch(e){}
+  if (!raw) return;
+  var data = null;
+  try { data = JSON.parse(raw); } catch(e){ return; }
+  G.player    = data.player    || G.player;
+  G.rating    = data.rating    || 0;
+  G.relations = data.relations || G.relations;
+  G.prologDone = data.prologDone || false;
+
+  buildHub();
+  updateTopbar();
+  clearFeed();
+  goTo('game');
+
+  if (G.prologDone) {
+    addNarratorPost([{ t:'note', text:'Игра загружена. Playcare ждёт тебя.' }]);
+    showHub();
+  } else {
+    runScene(data.scene || 's1');
+  }
+}
+
+// ─────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────
+(function init() {
+  // pre-select first gender
+  var firstG = document.querySelector('.gender-btn');
+  if (firstG) { firstG.classList.add('selected'); }
+})();
 </script>
 </body>
 </html>
